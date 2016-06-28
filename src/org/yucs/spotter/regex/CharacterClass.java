@@ -74,6 +74,12 @@ public class CharacterClass {
             case '?':
                 set.add('?');
                 break;
+            case '^':
+                set.add('^');
+                break;
+            case '$':
+                set.add('$');
+                break;
             case 'd':
                 parseRange(digits);
                 break;
