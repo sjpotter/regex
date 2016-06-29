@@ -23,6 +23,7 @@ class QuantifierWrapper {
                     q = handleVariable(regex, regex_pos + 1);
                 if (q != null)
                     regex_pos = end_pos + 1;
+                break;
             case '*':
                 q = new Quantifier(0, -1);
                 regex_pos++;
