@@ -58,14 +58,16 @@ class Token {
             return new Token('$');
         }
 
-        CharacterClassWrapper w = CharacterClassWrapper.getCharacterClass(regex, regex_pos);
-        regex_pos = w.regex_pos;
-        Quantifier q = Quantifier.parse(regex, regex_pos);
-        if (q != null) {
-            regex_pos = q.regex_pos;
+        CharacterClassWrapper ccw = CharacterClassWrapper.getCharacterClass(regex, regex_pos);
+        regex_pos = ccw.regex_pos;
+        QuantifierWrapper qw = QuantifierWrapper.parse(regex, regex_pos);
+        Quantifier q = null;
+        if (qw != null) {
+            regex_pos = qw.regex_pos;
+            q = qw.q;
         }
 
-        Token t = new Token(w.c, q);
+        Token t = new Token(ccw.c, q);
         t.next = tokenize(regex, regex_pos);
 
         return t;
