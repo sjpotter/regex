@@ -10,11 +10,12 @@ class CharacterClassWrapper {
         //NOTE: always make sure that the regex string is advanced if new cases are added
         switch (regex.charAt(regex_pos)) {
             case '[':
-                int end = regex.indexOf(regex_pos, ']');
+                int end = regex.indexOf(']', regex_pos);
                 if (end == -1) {
                     throw new Exception("need to end character class with a brace");
                 }
-                w.c = new CharacterClass(regex, regex_pos, end-1);
+                //cut out the [ and ]
+                w.c = new CharacterClass(regex, regex_pos+1, end-1);
                 w.regex_pos = end + 1;
                 break;
             case '\\':

@@ -61,15 +61,15 @@ class Quantifier {
                         }
                     }
 
-                    if (regex.length() > regex_pos && regex.charAt(regex_pos) == '}') { //valid {#,#}
-                        if (min <= val)
+                    if (regex.length() > regex_pos && regex.charAt(regex_pos) == '}') { //maybe valid {#,#}
+                        if (min <= val) // {min,val} only valid if min <= val (max)
                             return new Quantifier(min, val, regex_pos+1);
                     }
-                    //reached here, means we did {#,#<anything but '}'> so not a valid quantifier. consume nothing
                 }
             }
         }
 
+        //regex following { invalid as a quantifier
         return null;
     }
 }

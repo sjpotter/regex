@@ -40,7 +40,12 @@ class CharacterClass {
         if (all)
             return "<global>";
 
-        return String.valueOf(set);
+        String ret = String.valueOf(set);
+        if (negate) {
+            ret += " (negated)";
+        }
+
+        return ret;
     }
 
     boolean match(char c) {
