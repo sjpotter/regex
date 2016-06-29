@@ -2,40 +2,40 @@ package org.yucs.spotter.regex;
 
 class CharacterClassWrapper {
     CharacterClass c;
-    String regex;
+    int regex_pos;
 
-    public static CharacterClassWrapper getCharacterClass(String regex) throws Exception {
+    static CharacterClassWrapper getCharacterClass(String regex, int regex_pos) throws Exception {
         CharacterClassWrapper w = new CharacterClassWrapper();
 
         //NOTE: always make sure that the regex string is advanced if new cases are added
-        switch (regex.charAt(0)) {
+        switch (regex.charAt(regex_pos)) {
             case '[':
-                int end = regex.indexOf(']');
+                int end = regex.indexOf(regex_pos, ']');
                 if (end == -1) {
                     throw new Exception("need to end character class with a brace");
                 }
-                w.c = new CharacterClass(regex.substring(1, end + 1));
-                w.regex = regex.substring(end + 1);
+                w.c = new CharacterClass(regex, regex_pos, end-1);
+                w.regex_pos = end + 1;
                 break;
             case '\\':
-                w.c = new CharacterClass(regex.substring(0, 2));
-                w.regex = regex.substring(2);
+                w.c = new CharacterClass(regex, regex_pos, regex_pos + 1);
+                w.regex_pos = regex_pos + 2;
                 break;
             case '.':
                 w.c = CharacterClass.global;
-                w.regex = regex.substring(1);
+                w.regex_pos = regex_pos + 1;
                 break;
             case '^':
             case '$':
-//uncomment when handle these special characters
-//            case '|':
+            // uncomment when handle these special characters
+            // case '|':  //as this regex handles things character by character this will be hard to implement
             case '?':
             case '+':
             case '*':
                 throw new Exception("invalid character in regex: " + regex.charAt(0));
             default: //plain character
-                w.c = new CharacterClass(regex.substring(0, 1));
-                w.regex = regex.substring(1);
+                w.c = new CharacterClass(regex, regex_pos, regex_pos);
+                w.regex_pos = regex_pos + 1;
         }
 
         return w;

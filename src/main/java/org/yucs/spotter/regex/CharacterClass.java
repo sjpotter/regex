@@ -6,25 +6,25 @@ class CharacterClass {
     private boolean all = false;
     private boolean negate = false;
 
-    private final HashSet<Character> set = new HashSet<Character>();
-    final static CharacterClass global = new CharacterClass(true);
+    private final HashSet<Character> set = new HashSet<>();
+    final static CharacterClass global = new CharacterClass();
 
     private static final String digits = "0-9";
     private static final String lower = "a-z";
     private static final String upper = "A-Z";
 
-    CharacterClass(String str) throws Exception {
-        int i = 0;
-        if (str.length() > 1 && str.charAt(i) == '^') {
+    CharacterClass(String str, int beg, int end) throws Exception {
+        int i = beg;
+        if (end > beg && str.charAt(i) == '^') {
             i++;
             negate = true;
         }
-        for (; i < str.length(); i++) {
+        for (; i <= end; i++) {
             if (str.charAt(i) == '\\') {
-                parseSlash(str.substring(i, i+2));
+                parseSlash(str, i);
                 i++;
-            } else if (i+2 < str.length() && str.charAt(i+1) == '-' ) {
-                parseRange(str.substring(i,i+3));
+            } else if (i+2 <= end && str.charAt(i+1) == '-' ) {
+                parseRange(str, i);
                 i += 2;
             } else {
                 set.add(str.charAt(i));
@@ -32,36 +32,39 @@ class CharacterClass {
         }
     }
 
-    CharacterClass(boolean match) {
-        all = match;
+    private CharacterClass() {
+        all = true;
     }
 
-    public boolean match(char c) {
+    public String toString() {
+        if (all)
+            return "<global>";
+
+        return String.valueOf(set);
+    }
+
+    boolean match(char c) {
         if (all || set.contains(c))
             return !negate;
 
         return negate;
     }
 
-    private void parseRange(String s) throws Exception {
-        if (s.charAt(0) < s.charAt(2)) {
-            for(char c=s.charAt(0); c <= s.charAt(2); c++)
+    private void parseRange(String s, int pos) throws Exception {
+        if (s.charAt(pos) < s.charAt(pos+2)) {
+            for(char c=s.charAt(pos); c <= s.charAt(pos+2); c++)
                 set.add(c);
         } else {
             throw new Exception("Character class ranged have to be in ascending order");
         }
     }
 
-    private void parseSlash(String s) throws Exception {
-        if (s.length() != 2) {
-            throw new Exception("parseSlash requires a 2 character strings");
+    private void parseSlash(String s, int pos) throws Exception {
+        if (s.length() == pos + 1) {
+            throw new Exception("string ended with a single unescaped \\");
         }
 
-        if (s.charAt(0) != '\\') {
-            throw new Exception("parseSlash only takes 2 character strings if first character is a \\");
-        }
-
-        switch (s.charAt(1)) {
+        switch (s.charAt(pos + 1)) {
             case '\\':
                 set.add('\\');
                 break;
@@ -81,12 +84,12 @@ class CharacterClass {
                 set.add('$');
                 break;
             case 'd':
-                parseRange(digits);
+                parseRange(digits, 0);
                 break;
             case 'w':
-                parseRange(digits);
-                parseRange(upper);
-                parseRange(lower);
+                parseRange(digits, 0);
+                parseRange(upper, 0);
+                parseRange(lower, 0);
                 break;
             default:
                 throw new Exception("parseSlash: unknown slash case: " + s.charAt(1));
