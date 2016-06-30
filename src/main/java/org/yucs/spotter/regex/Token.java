@@ -43,7 +43,7 @@ class Token {
         return sb.toString();
     }
 
-    static Token tokenize(String regex, int regex_pos) throws Exception {
+    static Token tokenize(String regex, int regex_pos) throws RegexException {
         if (regex_pos == regex.length()) {
             return null;
         }

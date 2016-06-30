@@ -14,7 +14,7 @@ class CharacterClass {
     private static final String upper = "A-Z";
     private static final char[] whitespace = {' ', '\t','\r', '\n', '\f'};
 
-    CharacterClass(String str, int beg, int end) throws Exception {
+    CharacterClass(String str, int beg, int end) throws RegexException {
         int i = beg;
         boolean negate = false;
 
@@ -67,7 +67,7 @@ class CharacterClass {
         return characters.contains(c) || (negated.size() > 0 && !negated.contains(c)) || all;
     }
 
-    private void parseRange(boolean negate, String s, int pos) throws Exception {
+    private void parseRange(boolean negate, String s, int pos) throws RegexException {
         if (s.charAt(pos) < s.charAt(pos+2)) {
             for(char c=s.charAt(pos); c <= s.charAt(pos+2); c++)
                 if (!negate) {
@@ -76,13 +76,13 @@ class CharacterClass {
                     negated.add(c);
                 }
         } else {
-            throw new Exception("Character class ranged have to be in ascending order");
+            throw new RegexException("Character class ranged have to be in ascending order: " + s.substring(pos, pos+3));
         }
     }
 
-    private void parseSlash(boolean negate, String s, int pos) throws Exception {
+    private void parseSlash(boolean negate, String s, int pos) throws RegexException {
         if (s.length() == pos + 1) {
-            throw new Exception("string ended with a single unescaped \\");
+            throw new RegexException("string ended with a single unescaped \\");
         }
 
         switch (s.charAt(pos + 1)) {
@@ -131,7 +131,7 @@ class CharacterClass {
                 }
                 break;
             default:
-                throw new Exception("parseSlash: unknown slash case: " + s.charAt(1));
+                throw new RegexException("parseSlash: unknown slash case: " + s.charAt(pos + 1) + " at index: " + (pos+1));
         }
     }
 }

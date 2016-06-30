@@ -24,14 +24,14 @@ public class Regex {
                 } else {
                     System.out.println(text + " didn't match regex " + regex);
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (RegexException e) {
+                System.out.println(e.toString());
             }
         }
     }
 
     @SuppressWarnings("WeakerAccess") // Needs to be public to be usable elsewhere
-    public Regex(String r) throws Exception {
+    public Regex(String r) throws RegexException {
         t = Token.tokenize(r, 0);
     }
 

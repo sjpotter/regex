@@ -67,19 +67,19 @@ public class RegexTest {
         assertFalse(r.match("11234567890,abc"));
     }
 
-    @Test(expected = Exception.class)
+    @Test(expected = RegexException.class)
     public void invalidClassTest() throws Exception {
-        Regex r = new Regex("[asdf");
+        new Regex("[asdf");
     }
 
-    @Test(expected = Exception.class)
+    @Test(expected = RegexException.class)
     public void invalidRangeOrder() throws Exception {
-        Regex r = new Regex("[9-0]");
+        new Regex("[9-0]");
     }
 
-    @Test(expected = Exception.class)
+    @Test(expected = RegexException.class)
     public void illegalCharacterTest() throws Exception {
-        Regex r = new Regex("123**");
+        new Regex("123**");
     }
 
     @Test
@@ -101,14 +101,14 @@ public class RegexTest {
         assertFalse(r.match("1234a"));
     }
 
-    @Test(expected = Exception.class)
+    @Test(expected = RegexException.class)
     public void invalidEndSlashCharacterTest() throws Exception {
-        Regex r = new Regex("\\");
+        new Regex("\\");
     }
 
-    @Test(expected = Exception.class)
+    @Test(expected = RegexException.class)
     public void invalidSlashCharacterTest() throws Exception {
-        Regex r = new Regex("^\\P$");
+        new Regex("^\\P$");
     }
 
     @Test

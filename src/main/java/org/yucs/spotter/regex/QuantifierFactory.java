@@ -1,8 +1,8 @@
 package org.yucs.spotter.regex;
 
 class QuantifierFactory {
-    Quantifier q;
-    int regex_pos;
+    final Quantifier q;
+    final int regex_pos;
 
     private QuantifierFactory(Quantifier q, int regex_pos) {
         this.q = q;

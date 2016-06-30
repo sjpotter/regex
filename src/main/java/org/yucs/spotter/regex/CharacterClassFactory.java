@@ -4,7 +4,7 @@ class CharacterClassFactory {
     CharacterClass c;
     int regex_pos;
 
-    static CharacterClassFactory getCharacterClass(String regex, int regex_pos) throws Exception {
+    static CharacterClassFactory getCharacterClass(String regex, int regex_pos) throws RegexException {
         CharacterClassFactory w = new CharacterClassFactory();
 
         //NOTE: always make sure that the regex string is advanced if new cases are added
@@ -12,7 +12,7 @@ class CharacterClassFactory {
             case '[':
                 int end = regex.indexOf(']', regex_pos);
                 if (end == -1) {
-                    throw new Exception("need to end character class with a brace");
+                    throw new RegexException("need to end character class (started at index: " + regex_pos + ") with a brace");
                 }
                 //cut out the [ and ]
                 w.c = new CharacterClass(regex, regex_pos+1, end-1);
@@ -33,7 +33,7 @@ class CharacterClassFactory {
             case '?':
             case '+':
             case '*':
-                throw new Exception("invalid character in regex: " + regex.charAt(0));
+                throw new RegexException("invalid character in regex: " + regex.charAt(regex_pos) + " at index: " + regex_pos);
             default: //plain character
                 w.c = new CharacterClass(regex, regex_pos, regex_pos);
                 w.regex_pos = regex_pos + 1;
