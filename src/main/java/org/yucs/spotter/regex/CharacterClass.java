@@ -64,7 +64,7 @@ class CharacterClass {
     }
 
     boolean match(char c) {
-        return characters.contains(c) || !negated.contains(c) || all;
+        return characters.contains(c) || (negated.size() > 0 && !negated.contains(c)) || all;
     }
 
     private void parseRange(boolean negate, String s, int pos) throws Exception {
