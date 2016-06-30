@@ -4,30 +4,38 @@ import java.util.HashSet;
 
 class CharacterClass {
     private boolean all = false;
-    private boolean negate = false;
-
-    private final HashSet<Character> set = new HashSet<>();
     final static CharacterClass global = new CharacterClass();
+
+    private final HashSet<Character> characters = new HashSet<>();
+    private final HashSet<Character> negated = new HashSet<>();
 
     private static final String digits = "0-9";
     private static final String lower = "a-z";
     private static final String upper = "A-Z";
+    private static final char[] whitespace = {' ', '\t','\r', '\n', '\f'};
 
     CharacterClass(String str, int beg, int end) throws Exception {
         int i = beg;
-        if (end > beg && str.charAt(i) == '^') {
+        boolean negate = false;
+
+        if (end > beg && str.charAt(beg) == '^') {
             i++;
             negate = true;
         }
+
         for (; i <= end; i++) {
             if (str.charAt(i) == '\\') {
-                parseSlash(str, i);
+                parseSlash(negate, str, i);
                 i++;
             } else if (i+2 <= end && str.charAt(i+1) == '-' ) {
-                parseRange(str, i);
+                parseRange(negate, str, i);
                 i += 2;
             } else {
-                set.add(str.charAt(i));
+                if (!negate) {
+                    characters.add(str.charAt(i));
+                } else {
+                    negated.add(str.charAt(i));
+                }
             }
         }
     }
@@ -40,61 +48,87 @@ class CharacterClass {
         if (all)
             return "<global>";
 
-        String ret = String.valueOf(set);
-        if (negate) {
-            ret += " (negated)";
+        StringBuilder sb = new StringBuilder();
+
+        if (characters.size() > 0) {
+            sb.append("Positive: ").append(String.valueOf(characters));
+            if (negated.size() > 0) {
+                sb.append(" ");
+            }
+        }
+        if (negated.size() > 0) {
+            sb.append("Negative: ").append(String.valueOf(negated));
         }
 
-        return ret;
+        return sb.toString();
     }
 
     boolean match(char c) {
-        if (all || set.contains(c))
-            return !negate;
-
-        return negate;
+        return characters.contains(c) || !negated.contains(c) || all;
     }
 
-    private void parseRange(String s, int pos) throws Exception {
+    private void parseRange(boolean negate, String s, int pos) throws Exception {
         if (s.charAt(pos) < s.charAt(pos+2)) {
             for(char c=s.charAt(pos); c <= s.charAt(pos+2); c++)
-                set.add(c);
+                if (!negate) {
+                    characters.add(c);
+                } else {
+                    negated.add(c);
+                }
         } else {
             throw new Exception("Character class ranged have to be in ascending order");
         }
     }
 
-    private void parseSlash(String s, int pos) throws Exception {
+    private void parseSlash(boolean negate, String s, int pos) throws Exception {
         if (s.length() == pos + 1) {
             throw new Exception("string ended with a single unescaped \\");
         }
 
         switch (s.charAt(pos + 1)) {
             case '\\':
-                set.add('\\');
+                characters.add('\\');
                 break;
             case '+':
-                set.add('+');
+                characters.add('+');
                 break;
             case '*':
-                set.add('*');
+                characters.add('*');
                 break;
             case '?':
-                set.add('?');
+                characters.add('?');
                 break;
             case '^':
-                set.add('^');
+                characters.add('^');
                 break;
             case '$':
-                set.add('$');
+                characters.add('$');
                 break;
             case 'd':
-                parseRange(digits, 0);
+                parseRange(negate, digits, 0);
+                break;
+            case 'D':
+                parseRange(!negate, digits, 0);
                 break;
             case 'w':
-                parseRange(digits, 0);
-                parseRange(upper, 0);
-                parseRange(lower, 0);
+                parseRange(negate, digits, 0);
+                parseRange(negate, upper, 0);
+                parseRange(negate, lower, 0);
+                break;
+            case 'W':
+                parseRange(!negate, digits, 0);
+                parseRange(!negate, upper, 0);
+                parseRange(!negate, lower, 0);
+                break;
+            case 's':
+                for (char c : whitespace) {
+                    characters.add(c);
+                }
+                break;
+            case 'S':
+                for (char c : whitespace) {
+                    negated.add(c);
+                }
                 break;
             default:
                 throw new Exception("parseSlash: unknown slash case: " + s.charAt(1));
