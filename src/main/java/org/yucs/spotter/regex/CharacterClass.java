@@ -122,16 +122,40 @@ class CharacterClass {
                 break;
             case 's':
                 for (char c : whitespace) {
-                    characters.add(c);
+                    if (!negate)
+                        characters.add(c);
+                    else
+                        negated.add(c);
                 }
                 break;
             case 'S':
                 for (char c : whitespace) {
-                    negated.add(c);
+                    if (!negate)
+                        negated.add(c);
+                    else
+                        characters.add(c);
                 }
                 break;
             default:
                 throw new RegexException("parseSlash: unknown slash case: " + s.charAt(pos + 1) + " at index: " + (pos+1));
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CharacterClass that = (CharacterClass) o;
+
+        return all == that.all && characters.equals(that.characters) && negated.equals(that.negated);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (all ? 1 : 0);
+        result = 31 * result + characters.hashCode();
+        result = 31 * result + negated.hashCode();
+        return result;
     }
 }
