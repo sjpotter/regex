@@ -5,7 +5,6 @@ import org.yucs.spotter.regex.Quantifier;
 import org.yucs.spotter.regex.QuantifierFactory;
 import org.yucs.spotter.regex.RegexException;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,26 +29,10 @@ public class TokenFactory {
 
             List<Integer> pipes = findPipes(regex, regex_pos + 1, endParen-1);
             if (pipes.size() != 0) {
-                AltToken t = new AltToken();
-
-                int start = regex_pos + 1;
-                for (int pipe : pipes) {
-                    t.addAlt(tokenize(regex.substring(start, pipe), 0));
-                    start = pipe + 1;
-                }
-
-                t.addAlt(tokenize(regex.substring(start, endParen),0));
-                Token next = tokenize(regex, endParen+1);
-                Iterator<Token> it = t.getAlts();
-                while (it.hasNext()) {
-                    Token alt = it.next();
-                    while (alt.next != null)
-                        alt = alt.next;
-                    alt.next = next;
-                }
-                return t;
+                return createAltToken(regex, regex_pos, endParen, pipes);
             }
-            // no alternatives in paren, if we deal with matching groups, will have to keep paren token
+            // no alternatives in paren
+            // TODO: if we deal with matching groups, will have to keep paren token
             Token t = tokenize(regex.substring(regex_pos + 1, endParen), 0);
             Token next = tokenize(regex, endParen + 1);
             if (t == null) {
@@ -87,7 +70,7 @@ public class TokenFactory {
                 parens.push(i);
             }
             if (regex.charAt(i) == ')' && regex.charAt(i-1) != '\\') {
-                if (parens.size() == 0)
+                if (parens.size() == 0) // this is probably impossible if we start ther string with a '('
                     throw new RegexException("unbalanced parens");
                 parens.pop();
                 if (parens.size() == 0)
@@ -104,7 +87,7 @@ public class TokenFactory {
 
         for(int i=start; i <= end; i++) {
             if (regex.charAt(i) == '|' && (i == start || regex.charAt(i-1) != '\\') && parens.size() == 0) {
-                alternates.push(i);
+                alternates.addLast(i);
             } else if (regex.charAt(i) == '(' && (i == start || regex.charAt(i-1) != '\\')) {
                 parens.push(i);
             } else if  (regex.charAt(i) == ')' && (i == start || regex.charAt(i-1) != '\\')) {
@@ -117,4 +100,20 @@ public class TokenFactory {
 
         return alternates;
     }
+
+    private static Token createAltToken(String regex, int regex_pos, int endParen, List<Integer> pipes) throws RegexException {
+        AltToken t = new AltToken();
+
+        int start = regex_pos + 1;
+        for (int pipe : pipes) {
+            t.addAlt(tokenize(regex.substring(start, pipe), 0));
+            start = pipe + 1;
+        }
+
+        t.addAlt(tokenize(regex.substring(start, endParen),0));
+        t.next = tokenize(regex, endParen+1);
+
+        return t;
+    }
+
 }

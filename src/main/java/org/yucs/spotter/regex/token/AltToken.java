@@ -19,6 +19,7 @@ public class AltToken extends Token {
         return alts.iterator();
     }
 
+    // TODO: Unsure how to display
     public String toString() {
         return "Alternatives";
     }

@@ -5,9 +5,6 @@ import org.yucs.spotter.regex.token.*;
 import java.util.Iterator;
 import java.util.Scanner;
 
-import static org.yucs.spotter.regex.token.Token.tokenType.ALT;
-import static org.yucs.spotter.regex.token.Token.tokenType.ANCHOR;
-
 // Inspired by Rob Pike's implementation in TPOP:
 // http://www.cs.princeton.edu/courses/archive/spr09/cos333/beautiful.html
 
@@ -59,41 +56,56 @@ public class Regex {
 
     @SuppressWarnings("WeakerAccess") // Need to be public to be usable elsewhere
     public boolean match(String text) throws RegexException {
-        if (t.type == ANCHOR && ((AnchorToken) t).anchor == '^') //if first token is start anchor, consume it, and only try to match from start of text
-            return match(t.next, text, 0);
-
-        for(int i=0; i < text.length(); i++) { //no start anchor so can try matching from anywhere in text
-            if (match(t, text, i))
+        for(int i=0; i < text.length() || i == 0; i++) { //need to test empty text string too
+            if (match(t, text, i, null))
                 return true;
         }
 
         return false;
     }
 
-    private boolean match(Token t, String text, int text_pos) throws RegexException {
-        //finished regex, means we matched every token, so it passes
+    private boolean match(Token t, String text, int text_pos, Token future) throws RegexException {
+        // if we matched every token, we've finished regex, so it passes
         if (t == null) {
-            return true;
+            if (future == null) { // only finished if no future (i.e. after alternatives enclosed in a group (|)
+                return true;
+            } else { // if finished the token set of the alternative, continue after the alternative
+                t = future;
+                future = null;
+            }
         }
 
-        if (t.type == ANCHOR) {
-            if (((AnchorToken) t).anchor == '$') {
-                return text.length() == text_pos;
-            } else {
-                throw new RegexException("Unexpected ANCHOR token: " + ((AnchorToken) t).anchor);
-            }
-        } else if (t.type == ALT) {
-            return matchAlternates(text, text_pos, (AltToken) t);
-        } else {
-            CharacterToken ct = (CharacterToken) t;
-            if (ct.q != null)
-               return matchRange(text, text_pos, ct.c, ct.q, t.next);
-            // if this text character matches regex token, continue matching rest of text against rest of regex
-            return ct.c.match(text.charAt(text_pos)) && match(t.next, text, text_pos + 1);
+        switch (t.type) {
+            case ANCHOR:
+                AnchorToken at = (AnchorToken) t;
+                if (at.anchor == '$') {
+                    return text.length() == text_pos;
+                } else if (at.anchor == '^') {
+                    return text_pos == 0 && match(t.next, text, text_pos, future);
+                } else {
+                    throw new RegexException("Unexpected ANCHOR token: " + at.anchor);
+                }
+
+            case ALT:
+                return matchAlternates(text, text_pos, (AltToken) t);
+
+            case CHARACTER_CLASS:
+                CharacterToken ct = (CharacterToken) t;
+
+                if (ct.q != null)
+                   return matchRange(text, text_pos, ct.c, ct.q, t.next, future);
+
+                // 1. if we have no more text (i.e. text_pos >= text.length() short cut and return false
+                // 2. see if this character matches, if not short cut and return false
+                // 3. if passed above, continue matching rest of regex against rest of text
+                return text_pos < text.length() && ct.c.match(text.charAt(text_pos)) && match(t.next, text, text_pos + 1, future);
+
+            default:
+                throw new RegexException("Unknown TokenType: " + t.type);
         }
     }
 
-    private boolean matchRange(String text, int text_pos, CharacterClass c, Quantifier q, Token t) throws RegexException {
+    private boolean matchRange(String text, int text_pos, CharacterClass c, Quantifier q, Token t, Token future) throws RegexException {
         for (int i = 0; i < q.min; i++) { // can we match the minimum number of characters?
             if (text.length() > text_pos && c.match(text.charAt(text_pos))) {
                 text_pos++;
@@ -103,7 +115,7 @@ public class Regex {
         }
 
         for(int i=0; i <= q.max-q.min || q.max == -1; i++) {
-            if (match(t, text, text_pos)) { // matched the minimum, see if the rest of text matches the rest of the regex
+            if (match(t, text, text_pos, future)) { // matched the minimum, see if the rest of text matches the rest of the regex
                 return true;
             }
             // couldn't match rest of regex against rest of text
@@ -125,7 +137,7 @@ public class Regex {
         // so it just becomes, test every alternate
         while (it.hasNext()) {
             Token t = it.next();
-            if (match(t, text, text_pos))
+            if (match(t, text, text_pos, alts.next))
                 return true;
         }
 

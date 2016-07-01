@@ -163,6 +163,10 @@ public class RegexTest {
         assertFalse(r.match("sdfsd sdfsf"));
     }
 
-
+    @Test
+    public void broken() throws Exception {
+        Regex r = new Regex("^(abc|def|(hij*|kl*m)nop)qrs$");
+        assertTrue(r.match("hijjnopqrs"));
+    }
 
 }
