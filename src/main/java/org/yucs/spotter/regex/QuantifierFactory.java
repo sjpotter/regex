@@ -1,8 +1,8 @@
 package org.yucs.spotter.regex;
 
-class QuantifierFactory {
-    final Quantifier q;
-    final int regex_pos;
+public class QuantifierFactory {
+    public final Quantifier q;
+    public final int regex_pos;
 
     private QuantifierFactory(Quantifier q, int regex_pos) {
         this.q = q;
@@ -11,7 +11,7 @@ class QuantifierFactory {
 
     // parses out */+/{n}/{n,}/{n,m} syntax
     // */+/? are easy.  {} is complicated, as it can be a quantifier or just a regular regex character
-    static QuantifierFactory parse(String regex, int regex_pos) {
+    public static QuantifierFactory parse(String regex, int regex_pos) {
         if (regex.length() == regex_pos)
             return null;
 

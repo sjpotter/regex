@@ -1,8 +1,8 @@
 package org.yucs.spotter.regex;
 
-class Quantifier {
-    final int min;
-    final int max;
+public class Quantifier {
+    public final int min;
+    public final int max;
 
     Quantifier(int min, int max) {
         this.min = min;

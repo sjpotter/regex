@@ -2,7 +2,7 @@ package org.yucs.spotter.regex;
 
 import java.util.HashSet;
 
-class CharacterClass {
+public class CharacterClass {
     private boolean all = false;
     final static CharacterClass global = new CharacterClass();
 
@@ -103,6 +103,15 @@ class CharacterClass {
                 break;
             case '$':
                 characters.add('$');
+                break;
+            case '|':
+                characters.add('|');
+                break;
+            case '(':
+                characters.add('(');
+                break;
+            case ')':
+                characters.add(')');
                 break;
             case 'd':
                 parseRange(negate, digits, 0);
