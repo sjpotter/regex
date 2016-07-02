@@ -7,11 +7,13 @@ import java.util.List;
 class OpenParenToken extends Token {
     final int pos;
     int text_pos = -1;
+    private final CloseParenToken matched;
 
     private List<Token> alts = new LinkedList<>();
 
-    OpenParenToken(int p) {
+    OpenParenToken(int p, CloseParenToken cp) {
         pos = p;
+        matched = cp;
     }
 
     void addAlt(Token t) {
@@ -27,9 +29,7 @@ class OpenParenToken extends Token {
 
         this.text_pos = text_pos;
 
-        // every alternate chains to the rest of the regex after its grouping
-        // so it just becomes, test every alternate
-        r.closeParens.push((CloseParenToken) next);
+        r.closeParens.push(matched);
 
         while (it.hasNext()) {
             Token t = it.next();

@@ -84,7 +84,6 @@ public class Regex {
             }
         }
 
-        matches = null;
         return false;
     }
 

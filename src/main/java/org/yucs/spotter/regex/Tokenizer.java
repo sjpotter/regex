@@ -49,11 +49,11 @@ class Tokenizer {
             CloseParenToken cpt = new CloseParenToken();
             cptMap.put(endParen, cpt);
 
-            OpenParenToken t = createParenToken(regex_pos, endParen);
+            OpenParenToken t = createParenToken(regex_pos, endParen, cpt);
 
             cpt.matched = t;
 
-            t.next = tokenize(endParen, end);
+            tokenize(endParen, end);
 
             return t;
         }
@@ -112,12 +112,12 @@ class Tokenizer {
         return alternates;
     }
 
-    private OpenParenToken createParenToken(int regex_pos, int endParen) throws RegexException {
+    private OpenParenToken createParenToken(int regex_pos, int endParen, CloseParenToken cpt) throws RegexException {
         int start = regex_pos + 1;
 
         List<Integer> pipes = findPipes(start, endParen);
 
-        OpenParenToken t = new OpenParenToken(start);
+        OpenParenToken t = new OpenParenToken(start, cpt);
 
         for (int pipe : pipes) {
             t.addAlt(tokenize(start, pipe));
