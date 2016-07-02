@@ -8,7 +8,7 @@ import java.util.Map;
 class Tokenizer {
     private final String regex;
 
-    private Map<Integer, CloseParenToken> cpnMap = new HashMap<>();
+    private Map<Integer, CloseParenToken> cptMap = new HashMap<>();
 
     Tokenizer(String r) {
         regex = r;
@@ -36,7 +36,7 @@ class Tokenizer {
         }
 
         if (regex.charAt(regex_pos) == ')') {
-            Token t = cpnMap.get(regex_pos);
+            Token t = cptMap.get(regex_pos);
             t.next = tokenize(regex_pos + 1, end);
 
             return t;
@@ -45,8 +45,9 @@ class Tokenizer {
         if (regex.charAt(regex_pos) == '(') {
             int endParen = findMatchingParen(regex_pos);
 
+            //need to be able to match parens in the regex
             CloseParenToken cpt = new CloseParenToken();
-            cpnMap.put(endParen, cpt);
+            cptMap.put(endParen, cpt);
 
             OpenParenToken t = createParenToken(regex_pos, endParen);
 
@@ -95,7 +96,7 @@ class Tokenizer {
         LinkedList<Integer> parens = new LinkedList<>();
         LinkedList<Integer> alternates = new LinkedList<>();
 
-        for(int i=start; i <= end; i++) {
+        for(int i=start; i < end; i++) {
             if (regex.charAt(i) == '|' && (i == start || regex.charAt(i-1) != '\\') && parens.size() == 0) {
                 alternates.addLast(i);
             } else if (regex.charAt(i) == '(' && (i == start || regex.charAt(i-1) != '\\')) {
@@ -112,9 +113,9 @@ class Tokenizer {
     }
 
     private OpenParenToken createParenToken(int regex_pos, int endParen) throws RegexException {
-        List<Integer> pipes = findPipes(regex_pos + 1, endParen-2); // TODO: ugly
-
         int start = regex_pos + 1;
+
+        List<Integer> pipes = findPipes(start, endParen);
 
         OpenParenToken t = new OpenParenToken(start);
 
