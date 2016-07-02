@@ -7,8 +7,11 @@ import java.util.*;
 
 public class Regex {
     private Token t;
-    private SortedMap<Integer, String> groups = new TreeMap<>();
+
+    private SortedMap<Integer, String> groups;
     private ArrayList<String> matches;
+    Stack<CloseParenToken> closeParens;
+    String text;
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
@@ -66,8 +69,13 @@ public class Regex {
      */
     @SuppressWarnings("WeakerAccess") // Need to be public to be usable elsewhere
     public boolean match(String text) throws RegexException {
+        groups      = new TreeMap<>();
+        matches     = null;
+        closeParens = new Stack<>();
+        this.text   = text;
+
         for(int i=0; i < text.length() || i == 0; i++) { //need to test empty text string too
-            if (match(t, text, i, new Stack<CloseParenToken>())) {
+            if (match(t, i)) {
                 matches = new ArrayList<>(groups.size());
                 for(int key : groups.keySet()) {
                     matches.add(groups.get(key));
@@ -84,26 +92,24 @@ public class Regex {
      * The main internal matching function
      *
      * @param t           the current regex token we are matching against
-     * @param text        the entire text
      * @param text_pos    our current location within the text
-     * @param closeParen  a stack of where we accumulate grouping matches
      * @return            true/false if we were able to finish matching the regex from here
      * @throws RegexException
      */
-    boolean match(Token t, String text, int text_pos, Stack<CloseParenToken> closeParen) throws RegexException {
+    boolean match(Token t, int text_pos) throws RegexException {
         // if we matched every token, we've finished regex, so it passes
         if (t == null) {
-            if (closeParen.size() == 0) { // only finished if no paren (i.e. after alternatives enclosed in a group (|)
+            if (closeParens.size() == 0) { // only finished if no paren (i.e. after alternatives enclosed in a group (|)
                 return true;
             } else { // if finished the token set of the alternative, continue after the alternative
-                t = closeParen.pop();
+                t = closeParens.pop();
             }
         }
 
-        return t.match(this, text, text_pos, closeParen);
+        return t.match(this, text_pos);
     }
 
-    void recordGroup(int paren_pos, String text, int text_start, int text_end) {
+    void recordGroup(int paren_pos, int text_start, int text_end) {
         groups.put(paren_pos, text.substring(text_start, text_end));
     }
 }
