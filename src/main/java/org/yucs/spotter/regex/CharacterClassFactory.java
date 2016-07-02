@@ -1,10 +1,10 @@
 package org.yucs.spotter.regex;
 
-public class CharacterClassFactory {
-    public CharacterClass c;
-    public int regex_pos;
+class CharacterClassFactory {
+    CharacterClass c;
+    int regex_pos;
 
-    public static CharacterClassFactory getCharacterClass(String regex, int regex_pos) throws RegexException {
+    static CharacterClassFactory getCharacterClass(String regex, int regex_pos) throws RegexException {
         CharacterClassFactory w = new CharacterClassFactory();
 
         //NOTE: always make sure that the regex string is advanced if new cases are added

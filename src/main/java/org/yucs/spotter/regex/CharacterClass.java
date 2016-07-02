@@ -2,7 +2,7 @@ package org.yucs.spotter.regex;
 
 import java.util.HashSet;
 
-public class CharacterClass {
+class CharacterClass {
     private boolean all = false;
     final static CharacterClass global = new CharacterClass();
 
@@ -63,7 +63,7 @@ public class CharacterClass {
         return sb.toString();
     }
 
-    boolean match(char c) {
+    public boolean match(char c) {
         return characters.contains(c) || (negated.size() > 0 && !negated.contains(c)) || all;
     }
 

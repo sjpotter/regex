@@ -1,50 +1,60 @@
-package org.yucs.spotter.regex.token;
+package org.yucs.spotter.regex;
 
-import org.yucs.spotter.regex.CharacterClassFactory;
-import org.yucs.spotter.regex.Quantifier;
-import org.yucs.spotter.regex.QuantifierFactory;
-import org.yucs.spotter.regex.RegexException;
-
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
-public class TokenFactory {
-    public static Token tokenize(String regex, int regex_pos) throws RegexException {
-        if (regex_pos == regex.length()) {
+class Tokenizer {
+    private final String regex;
+
+    private Map<Integer, CloseParenToken> cpnMap = new HashMap<>();
+
+    Tokenizer(String r) {
+        regex = r;
+    }
+
+    Token tokenize() throws RegexException {
+        return tokenize(0, regex.length());
+    }
+
+    private Token tokenize(int regex_pos, int end) throws RegexException {
+        if (regex_pos >= end) {
             return null;
         }
 
-        if (regex_pos == 0 && regex.charAt(regex_pos) == '^') {
+        if (regex.charAt(regex_pos) == '^') {
             Token t = new AnchorToken('^');
-            t.next = tokenize(regex, regex_pos + 1);
+            t.next = tokenize(regex_pos + 1, end);
             return t;
         }
 
-        if (regex_pos + 1 == regex.length() && regex.charAt(regex_pos) == '$') {
-            return new AnchorToken('$');
+        if (regex.charAt(regex_pos) == '$') {
+            Token t = new AnchorToken('$');
+            t.next = tokenize(regex_pos + 1, end);
+            return t;
+        }
+
+        if (regex.charAt(regex_pos) == ')') {
+            Token t = cpnMap.get(regex_pos);
+            t.next = tokenize(regex_pos + 1, end);
+
+            return t;
         }
 
         if (regex.charAt(regex_pos) == '(') {
-            int endParen = findMatchingParen(regex, regex_pos);
+            int endParen = findMatchingParen(regex_pos);
 
-            List<Integer> pipes = findPipes(regex, regex_pos + 1, endParen-1);
-            if (pipes.size() != 0) {
-                return createAltToken(regex, regex_pos, endParen, pipes);
-            }
-            // no alternatives in paren
-            // TODO: if we deal with matching groups, will have to keep paren token
-            Token t = tokenize(regex.substring(regex_pos + 1, endParen), 0);
-            Token next = tokenize(regex, endParen + 1);
-            if (t == null) {
-                return next;
-            } else {
-                Token tmp = t;
-                while (tmp.next != null)
-                    tmp = tmp.next;
-                tmp.next = next;
+            CloseParenToken cpt = new CloseParenToken();
+            cpnMap.put(endParen, cpt);
 
-                return t;
-            }
+            OpenParenToken t = createParenToken(regex_pos, endParen);
+
+            cpt.matched = t;
+
+            t.next = tokenize(endParen, end);
+
+            return t;
         }
 
         CharacterClassFactory ccf = CharacterClassFactory.getCharacterClass(regex, regex_pos);
@@ -58,12 +68,12 @@ public class TokenFactory {
         }
 
         Token t = new CharacterToken(ccf.c, q);
-        t.next = tokenize(regex, regex_pos);
+        t.next = tokenize(regex_pos, end);
 
         return t;
     }
 
-    private static int findMatchingParen(String regex, int start) throws RegexException {
+    private int findMatchingParen(int start) throws RegexException {
         LinkedList<Integer> parens = new LinkedList<>();
         for(int i = start; i < regex.length(); i++) {
             if (regex.charAt(i) == '(' && (i == 0 || regex.charAt(i-1) != '\\')) {
@@ -81,7 +91,7 @@ public class TokenFactory {
         throw new RegexException("unbalanced parens");
     }
 
-    private static List<Integer> findPipes(String regex, int start, int end) throws RegexException {
+    private List<Integer> findPipes(int start, int end) throws RegexException {
         LinkedList<Integer> parens = new LinkedList<>();
         LinkedList<Integer> alternates = new LinkedList<>();
 
@@ -101,19 +111,20 @@ public class TokenFactory {
         return alternates;
     }
 
-    private static Token createAltToken(String regex, int regex_pos, int endParen, List<Integer> pipes) throws RegexException {
-        AltToken t = new AltToken();
+    private OpenParenToken createParenToken(int regex_pos, int endParen) throws RegexException {
+        List<Integer> pipes = findPipes(regex_pos + 1, endParen-2); // TODO: ugly
 
         int start = regex_pos + 1;
+
+        OpenParenToken t = new OpenParenToken(start);
+
         for (int pipe : pipes) {
-            t.addAlt(tokenize(regex.substring(start, pipe), 0));
+            t.addAlt(tokenize(start, pipe));
             start = pipe + 1;
         }
 
-        t.addAlt(tokenize(regex.substring(start, endParen),0));
-        t.next = tokenize(regex, endParen+1);
+        t.addAlt(tokenize(start, endParen));
 
         return t;
     }
-
 }
