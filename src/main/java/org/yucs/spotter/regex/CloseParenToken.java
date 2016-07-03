@@ -1,7 +1,7 @@
 package org.yucs.spotter.regex;
 
+@SuppressWarnings("SameParameterValue")
 class CloseParenToken extends Token {
-
     OpenParenToken matched;
 
     private final boolean capturing;
@@ -16,10 +16,11 @@ class CloseParenToken extends Token {
     }
 
     @Override
-    public boolean match(Regex r) throws RegexException {
+    public boolean match(Matcher m) throws RegexException {
+        int text_pos = m.getTextPosition();
         if (capturing)
-            r.recordGroup(matched.pos, matched.text_pos, r.text_pos);
+            m.recordGroup(matched.pos, text_pos);
 
-        return r.match(next);
+        return m.match(next);
     }
 }

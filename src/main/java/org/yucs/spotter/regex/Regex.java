@@ -5,13 +5,9 @@ import java.util.*;
 // Inspired by Rob Pike's implementation in TPOP:
 // http://www.cs.princeton.edu/courses/archive/spr09/cos333/beautiful.html
 
+@SuppressWarnings("WeakerAccess")
 public class Regex {
-    private Token t;
-
-    ArrayList<String> groups;
-    String text;
-    int text_pos;
-    final private int parenCount;
+    final private Tokenizer tokenizer;
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
@@ -21,13 +17,13 @@ public class Regex {
             String text = sc.next();
 
             try {
-                Regex matcher = new Regex('(' + regex + ')');
+                Matcher matcher = (new Regex(regex)).Matcher();
 
                 if (matcher.match(text)) {
                     System.out.println(text + " matched regex " + regex);
                     System.out.println("Groups:");
                     int i = 0;
-                    for(String match : matcher.groups) {
+                    for(String match : matcher.getGroups()) {
                         System.out.println(i++ + ": " + match);
                     }
                 } else {
@@ -39,65 +35,20 @@ public class Regex {
         }
     }
 
-    @SuppressWarnings("WeakerAccess") // Needs to be public to be usable elsewhere
+//    @SuppressWarnings("WeakerAccess") // Needs to be public to be usable elsewhere
     public Regex(String r) throws RegexException {
-        Tokenizer tokenizer = new Tokenizer(r);
-        t = tokenizer.tokenize();
-        parenCount = tokenizer.captureCount;
+        String regex = '(' + r + ')';
+
+        tokenizer = new Tokenizer(regex);
+        tokenizer.tokenize();
     }
 
-    /*
-    public String toString() {
-        Token t = this.t;
-        StringBuilder sb = new StringBuilder();
-
-        while (t != null) {
-            sb.append(t).append("\n");
-            t = t.next;
-        }
-
-        if (sb.length() > 0)
-            sb.setLength(sb.length()-1);
-
-        return sb.toString();
-    } */
-
-    /**
-     * Returns a boolean that says if the text matched against the Regex
-     *
-     * @param text the text to match against the regex
-     * @return true/false if the text matches against the regex
-     * @throws RegexException
-     */
-    @SuppressWarnings("WeakerAccess") // Need to be public to be usable elsewhere
     public boolean match(String text) throws RegexException {
-        groups      = new ArrayList<>(Arrays.asList(new String[parenCount]));
-        this.text   = text;
-
-        for(int i=0; i < text.length() || i == 0; i++) { //need to test empty text string too
-            text_pos = i;
-            if (match(t)) {
-                return true;
-            }
-        }
-
-        return false;
+        return (new Matcher(tokenizer).match(text));
     }
 
-    /**
-     * The main internal matching function
-     *
-     * @param t           the current regex token we are matching against
-     * @return            true/false if we were able to finish matching the regex from here
-     * @throws RegexException
-     */
-    boolean match(Token t) throws RegexException {
-        // if we matched every token, we've finished regex, so it passes
-        return t == null || t.match(this);
-
-    }
-
-    void recordGroup(int paren_pos, int text_start, int text_end) {
-        groups.set(paren_pos, text.substring(text_start, text_end));
+    @SuppressWarnings("WeakerAccess")
+    public Matcher Matcher() throws RegexException {
+        return new Matcher(tokenizer);
     }
 }

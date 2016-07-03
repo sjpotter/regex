@@ -6,8 +6,9 @@ import java.util.List;
 
 class OpenParenToken extends Token {
     final int pos;
-    int text_pos = -1;
-    private final CloseParenToken matched;
+
+    @SuppressWarnings({"FieldCanBeLocal", "unused"}) // might need it later
+    final private CloseParenToken matched;
 
     final private List<Token> alts = new LinkedList<>();
 
@@ -24,15 +25,15 @@ class OpenParenToken extends Token {
     public String toString() { return "Group"; }
 
     @Override
-    public boolean match(Regex r) throws RegexException {
+    public boolean match(Matcher m) throws RegexException {
         Iterator<Token> it = alts.iterator();
 
-        this.text_pos = r.text_pos;
+        m.setParenPosition(pos, m.getTextPosition());
 
         while (it.hasNext()) {
             Token t = it.next();
-            if (r.match(t))
-                if (r.match(next))
+            if (m.match(t))
+                if (m.match(next))
                     return true;
         }
 

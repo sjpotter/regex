@@ -8,22 +8,22 @@ class BackReferenceToken extends Token {
     }
 
     @Override
-    public boolean match(Regex r) throws RegexException {
-        int text_pos = r.text_pos;
-
-        String stored = r.groups.get(backreference);
+    public boolean match(Matcher m) throws RegexException {
+        String text = m.getText();
+        int text_pos = m.getTextPosition();
+        String stored = m.getGroup(backreference);
         if (stored == null)
             return false;
 
         for(int i=0; i < stored.length(); i++) {
-            if (text_pos >= r.text.length() || stored.charAt(i) != r.text.charAt(text_pos)) {
+            if (text_pos >= text.length() || stored.charAt(i) != text.charAt(text_pos)) {
                 return false;
             }
             text_pos++;
         }
 
-        r.text_pos = text_pos;
+        m.setTextPosition(text_pos);
 
-        return r.match(next);
+        return m.match(next);
     }
 }

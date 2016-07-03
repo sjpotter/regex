@@ -16,11 +16,14 @@ class CharacterToken extends Token {
     }
 
     @Override
-    public boolean match(Regex r) throws RegexException {
-        if (r.text_pos < r.text.length()) {
-            if (c.match(r.text.charAt(r.text_pos))) {
-                r.text_pos++;
-                return r.match(next);
+    public boolean match(Matcher m) throws RegexException {
+        String text = m.getText();
+        int text_pos = m.getTextPosition();
+
+        if (text_pos < text.length()) {
+            if (c.match(text.charAt(text_pos))) {
+                m.setTextPosition(text_pos+1);
+                return m.match(next);
             }
         }
 

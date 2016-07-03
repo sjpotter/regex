@@ -11,28 +11,28 @@ class QuantifierToken extends Token {
         this.t = t;
     }
 
-    public boolean match(Regex r) throws RegexException {
+    public boolean match(Matcher m) throws RegexException {
         // match minimum
         for (int i = 0; i < q.min; i++) {
-            if (!r.match(t))
+            if (!m.match(t))
                 return false;
         }
         
         if (q.greedy)
-            return matchGreedy(r);
+            return matchGreedy(m);
         
-        return matchNotGreedy(r);
+        return matchNotGreedy(m);
     }
 
-    private boolean matchGreedy(Regex r) throws RegexException {
+    private boolean matchGreedy(Matcher m) throws RegexException {
         Stack<Integer> text_pos = new Stack<>();
-        int old_text_pos = r.text_pos;
+        int old_text_pos = m.getTextPosition();
 
         // as greedy, match as much as possible
         for(int i=0; i < q.max-q.min || q.max == -1; i++) {
-            if (r.match(t)) {
+            if (m.match(t)) {
                 text_pos.push(old_text_pos);
-                old_text_pos = r.text_pos;
+                old_text_pos = m.getTextPosition();
             } else {
                 break;
             }
@@ -40,25 +40,25 @@ class QuantifierToken extends Token {
 
         // try to match from here (consumed as much as possible) and if can't, back off one by one until minimum match
         while (text_pos.size() > 0) {
-            if (r.match(next)) {
+            if (m.match(next)) {
                 return true;
             }
-            r.text_pos = text_pos.pop();
+            m.setTextPosition(text_pos.pop());
         }
 
-        return r.match(next);
+        return m.match(next);
     }
 
-    private boolean matchNotGreedy(Regex r) throws RegexException {
+    private boolean matchNotGreedy(Matcher m) throws RegexException {
         for(int i=0; i <= q.max-q.min || q.max == -1; i++) {
             // try to match from here (starting with minimum match, adding one by one if can't match)
-            if (r.match(next)) { // matched the minimum, see if the rest of text matches the rest of the regex
+            if (m.match(next)) { // matched the minimum, see if the rest of text matches the rest of the regex
                 return true;
             }
 
             // couldn't match rest of regex against rest of text
             // so now try to match one more (till maximum/infinity) before we retry
-            if (!r.match(t))
+            if (!m.match(t))
                 return false;
         }
 
