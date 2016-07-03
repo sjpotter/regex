@@ -68,9 +68,14 @@ public class Matcher {
 
     String getText() { return text; }
 
-    String getGroup(int pos) { return groups.get(pos); }
-
     void setParenPosition(int paren, int pos) { parenPosition.set(paren, pos); }
 
-    List<String> getGroups() { return groups; }
+    public List<String> getGroups() { return groups; }
+
+    public String getGroup(int pos) throws RegexException {
+        if (pos >= groups.size())
+            throw new RegexException("Group " + pos + " does not exit");
+
+        return groups.get(pos);
+    }
 }
