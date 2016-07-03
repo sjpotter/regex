@@ -8,7 +8,9 @@ class BackReferenceToken extends Token {
     }
 
     @Override
-    public boolean match(Regex r, int text_pos) throws RegexException {
+    public boolean match(Regex r) throws RegexException {
+        int text_pos = r.text_pos;
+
         String stored = r.groups.get(backreference);
         if (stored == null)
             return false;
@@ -20,6 +22,8 @@ class BackReferenceToken extends Token {
             text_pos++;
         }
 
-        return r.match(next, text_pos);
+        r.text_pos = text_pos;
+
+        return r.match(next);
     }
 }

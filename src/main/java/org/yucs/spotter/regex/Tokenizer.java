@@ -8,7 +8,7 @@ import java.util.Map;
 class Tokenizer {
     private final String regex;
 
-    int parenCount = 0;
+    int captureCount = 0;
 
     final private Map<Integer, CloseParenToken> cptMap = new HashMap<>();
 
@@ -21,57 +21,49 @@ class Tokenizer {
     }
 
     private Token tokenize(int regex_pos, int end) throws RegexException {
+        Token t;
+
+
         if (regex_pos >= end) {
             return null;
         }
 
-        // start of line anchor token
+        // Non quantifiable regex token
         if (regex.charAt(regex_pos) == '^') {
-            Token t = new AnchorToken('^');
+            // start of line anchor token
+            t = new AnchorToken('^');
             t.next = tokenize(regex_pos + 1, end);
             return t;
-        }
-
-        // end of line anchor token
-        if (regex.charAt(regex_pos) == '$') {
-            Token t = new AnchorToken('$');
+        } else if (regex.charAt(regex_pos) == '$') {
+            // end of line anchor token
+            t = new AnchorToken('$');
             t.next = tokenize(regex_pos + 1, end);
             return t;
-        }
-
-        // word boundary anchor token
-        if (regex.charAt(regex_pos) == '\\'  && (regex.charAt(regex_pos+1) == 'b' || regex.charAt(regex_pos+1) == 'B')) {
-            Token t = new AnchorToken(regex.charAt(regex_pos+1));
+        } else if (regex.charAt(regex_pos) == '\\'  && (regex_pos+1 < regex.length() && (regex.charAt(regex_pos+1) == 'b' || regex.charAt(regex_pos+1) == 'B'))) {
+            // word boundary anchor token
+            t = new AnchorToken(regex.charAt(regex_pos+1));
             t.next = tokenize(regex_pos+2, end);
             return t;
+        } else if (regex.charAt(regex_pos) == ')') {
+            // end group token
+            return cptMap.get(regex_pos);
         }
 
-        // end group token
-        if (regex.charAt(regex_pos) == ')') {
-            Token t = cptMap.get(regex_pos);
-            t.next = tokenize(regex_pos + 1, end);
-            return t;
-        }
-
-        // start group token
+        // Quantifiable regex tokens
         if (regex.charAt(regex_pos) == '(') {
+            // start group token
             int endParen = findMatchingParen(regex_pos);
 
             //need to be able to match parens in the regex
             CloseParenToken cpt = new CloseParenToken();
             cptMap.put(endParen, cpt);
 
-            OpenParenToken t = createParenToken(regex_pos, endParen, cpt);
+            t = createParenToken(regex_pos, endParen + 1, cpt);
+            cpt.matched = (OpenParenToken) t;
 
-            cpt.matched = t;
-
-            tokenize(endParen, end);
-
-            return t;
-        }
-
-        // Backreference token
-        if (regex.charAt(regex_pos) == '\\' && Character.isDigit(regex.charAt(regex_pos+1))) {
+            regex_pos = endParen + 1;
+        } else if (regex.charAt(regex_pos) == '\\' && (regex_pos+1 < regex.length() && Character.isDigit(regex.charAt(regex_pos+1)))) {
+            // Backreference token
             regex_pos++;
             int val = Character.digit(regex.charAt(regex_pos), 10);
             while (Character.isDigit(regex.charAt(regex_pos+1))) {
@@ -80,23 +72,22 @@ class Tokenizer {
                 val += Character.digit(regex.charAt(regex_pos), 10);
             }
 
-            Token t = new BackReferenceToken(val);
-            t.next = tokenize(regex_pos+1, end);
-            return t;
-        }
+            t = new BackReferenceToken(val);
+            regex_pos++;
+        } else {
+            // regular character matching token
+            CharacterClassFactory ccf = CharacterClassFactory.getCharacterClass(regex, regex_pos);
 
-        // regular character matching token
-        CharacterClassFactory ccf = CharacterClassFactory.getCharacterClass(regex, regex_pos);
-        regex_pos = ccf.regex_pos;
+            t = new CharacterToken(ccf.c);
+            regex_pos = ccf.regex_pos;
+        }
 
         QuantifierFactory qf = QuantifierFactory.parse(regex, regex_pos);
-        Quantifier q = null;
         if (qf != null) {
+            t = new QuantifierToken(qf.q, t);
             regex_pos = qf.regex_pos;
-            q = qf.q;
         }
 
-        Token t = new CharacterToken(ccf.c, q);
         t.next = tokenize(regex_pos, end);
         return t;
     }
@@ -123,7 +114,7 @@ class Tokenizer {
         LinkedList<Integer> parens = new LinkedList<>();
         LinkedList<Integer> alternates = new LinkedList<>();
 
-        for(int i=start; i < end; i++) {
+        for(int i=start; i < end-1; i++) { //last element should be a paren
             if (regex.charAt(i) == '|' && (i == start || regex.charAt(i-1) != '\\') && parens.size() == 0) {
                 alternates.addLast(i);
             } else if (regex.charAt(i) == '(' && (i == start || regex.charAt(i-1) != '\\')) {
@@ -144,7 +135,7 @@ class Tokenizer {
 
         List<Integer> pipes = findPipes(start, endParen);
 
-        OpenParenToken t = new OpenParenToken(parenCount++, cpt);
+        OpenParenToken t = new OpenParenToken(captureCount++, cpt);
 
         for (int pipe : pipes) {
             t.addAlt(tokenize(start, pipe));

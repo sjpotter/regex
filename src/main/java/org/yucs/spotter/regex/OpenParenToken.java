@@ -24,16 +24,16 @@ class OpenParenToken extends Token {
     public String toString() { return "Group"; }
 
     @Override
-    public boolean match(Regex r, int text_pos) throws RegexException {
+    public boolean match(Regex r) throws RegexException {
         Iterator<Token> it = alts.iterator();
 
-        this.text_pos = text_pos;
+        this.text_pos = r.text_pos;
 
         r.closeParens.push(matched);
 
         while (it.hasNext()) {
             Token t = it.next();
-            if (r.match(t, text_pos))
+            if (r.match(t))
                 return true;
         }
 

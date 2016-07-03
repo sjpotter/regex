@@ -11,6 +11,7 @@ public class Regex {
     ArrayList<String> groups;
     Stack<CloseParenToken> closeParens;
     String text;
+    int text_pos;
     final private int parenCount;
 
     public static void main(String[] args) {
@@ -43,7 +44,7 @@ public class Regex {
     public Regex(String r) throws RegexException {
         Tokenizer tokenizer = new Tokenizer(r);
         t = tokenizer.tokenize();
-        parenCount = tokenizer.parenCount;
+        parenCount = tokenizer.captureCount;
     }
 
     /*
@@ -76,7 +77,8 @@ public class Regex {
         this.text   = text;
 
         for(int i=0; i < text.length() || i == 0; i++) { //need to test empty text string too
-            if (match(t, i)) {
+            text_pos = i;
+            if (match(t)) {
                 return true;
             }
         }
@@ -88,11 +90,10 @@ public class Regex {
      * The main internal matching function
      *
      * @param t           the current regex token we are matching against
-     * @param text_pos    our current location within the text
      * @return            true/false if we were able to finish matching the regex from here
      * @throws RegexException
      */
-    boolean match(Token t, int text_pos) throws RegexException {
+    boolean match(Token t) throws RegexException {
         // if we matched every token, we've finished regex, so it passes
         if (t == null) {
             if (closeParens.size() == 0) { // only finished if no paren (i.e. after alternatives enclosed in a group (|)
@@ -102,7 +103,7 @@ public class Regex {
             }
         }
 
-        return t.match(this, text_pos);
+        return t.match(this);
     }
 
     void recordGroup(int paren_pos, int text_start, int text_end) {
