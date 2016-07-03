@@ -24,6 +24,6 @@ class BackReferenceToken extends Token {
 
         m.setTextPosition(text_pos);
 
-        return m.match(next);
+        return next.match(m);
     }
 }

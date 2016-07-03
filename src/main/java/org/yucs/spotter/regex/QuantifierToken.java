@@ -14,7 +14,7 @@ class QuantifierToken extends Token {
     public boolean match(Matcher m) throws RegexException {
         // match minimum
         for (int i = 0; i < q.min; i++) {
-            if (!m.match(t))
+            if (!t.match(m))
                 return false;
         }
         
@@ -30,7 +30,7 @@ class QuantifierToken extends Token {
 
         // as greedy, match as much as possible and record backtrack positions
         for(int i=0; i < q.max-q.min || q.max == -1; i++) {
-            if (m.match(t)) {
+            if (t.match(m)) {
                 text_pos.push(old_text_pos);
                 old_text_pos = m.getTextPosition();
             } else {
@@ -40,25 +40,25 @@ class QuantifierToken extends Token {
 
         // try to match from here, but manual backtrack is necessary
         while (text_pos.size() > 0) {
-            if (m.match(next)) {
+            if (next.match(m)) {
                 return true;
             }
             m.setTextPosition(text_pos.pop());
         }
 
-        return m.match(next);
+        return next.match(m);
     }
 
     private boolean matchNotGreedy(Matcher m) throws RegexException {
         for(int i=0; i <= q.max-q.min || q.max == -1; i++) {
             // try to match from here (starting with minimum match, adding one by one if can't match)
-            if (m.match(next)) { // matched the minimum, see if the rest of text matches the rest of the regex
+            if (next.match(m)) { // matched the minimum, see if the rest of text matches the rest of the regex
                 return true;
             }
 
             // couldn't match rest of regex against rest of text
             // so now try to match one more (till maximum/infinity) before we retry
-            if (!m.match(t))
+            if (!t.match(m))
                 return false;
         }
 

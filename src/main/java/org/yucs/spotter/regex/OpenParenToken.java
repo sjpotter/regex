@@ -29,8 +29,8 @@ class OpenParenToken extends Token {
 
         while (it.hasNext()) {
             Token t = it.next();
-            if (m.match(t))
-                if (m.match(next))
+            if (t.match(m))
+                if (next.match(m))
                     return true;
         }
 

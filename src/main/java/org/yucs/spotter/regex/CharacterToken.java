@@ -15,7 +15,7 @@ class CharacterToken extends Token {
         if (text_pos < text.length()) {
             if (c.match(text.charAt(text_pos))) {
                 m.setTextPosition(text_pos+1);
-                return m.match(next);
+                return next.match(m);
             }
         }
 

@@ -17,9 +17,9 @@ class AnchorToken extends Token {
         int text_pos = m.getTextPosition();
 
         if (anchor == '$') {
-            return text.length() == text_pos && m.match(next);
+            return text.length() == text_pos && next.match(m);
         } else if (anchor == '^') {
-            return text_pos == 0 && m.match(next);
+            return text_pos == 0 && next.match(m);
         } else if (anchor == 'b' || anchor == 'B') {
             boolean negative = false;
 
@@ -28,19 +28,19 @@ class AnchorToken extends Token {
 
             if (text_pos == 0) {
                 if (Character.isAlphabetic(text.charAt(text_pos)))
-                    return !negative && m.match(next);
+                    return !negative && next.match(m);
             } else if (text_pos == text.length()) {
                 if (Character.isAlphabetic(text.charAt(text_pos - 1))) {
-                    return !negative && m.match(next);
+                    return !negative && next.match(m);
                 }
             } else {
                 if ((Character.isWhitespace(text.charAt(text_pos - 1)) && Character.isAlphabetic(text.charAt(text_pos))) ||
                     (Character.isWhitespace(text.charAt(text_pos)) && Character.isAlphabetic(text.charAt(text_pos - 1)))) {
-                    return !negative && m.match(next);
+                    return !negative && next.match(m);
                 }
             }
 
-            return negative && m.match(next);
+            return negative && next.match(m);
         } else {
             throw new RegexException("Unexpected ANCHOR token: " + anchor);
         }

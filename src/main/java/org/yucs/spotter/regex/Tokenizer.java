@@ -28,12 +28,11 @@ class Tokenizer {
     private Token tokenize(int regex_pos, int end) throws RegexException {
         Token t;
 
-
         if (regex_pos >= end) {
-            return null;
+            return NullToken.Instance;
         }
 
-        // Non quantifiable regex token
+        // Non quantifiable regex token, return in their block
         if (regex.charAt(regex_pos) == '^') {
             // start of line anchor token
             t = new AnchorToken('^');
@@ -54,7 +53,7 @@ class Tokenizer {
             return cptMap.get(regex_pos);
         }
 
-        // Quantifiable regex tokens
+        // Quantifiable regex tokens, return at end when quantifier is parsed if present
         if (regex.charAt(regex_pos) == '(') {
             // start group token
             int endParen = findMatchingParen(regex_pos);

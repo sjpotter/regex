@@ -33,7 +33,7 @@ public class Matcher {
 
         for(int i=0; i < text.length() || i == 0; i++) { //need to test empty text string too
             text_pos = i;
-            if (match(t)) {
+            if (t.match(this)) {
                 return true;
             }
         }
@@ -41,18 +41,6 @@ public class Matcher {
         return false;
     }
 
-    /**
-     * The main internal matching function
-     *
-     * @param t           the current regex token we are matching against
-     * @return            true/false if we were able to finish matching the regex from here
-     * @throws RegexException
-     */
-    boolean match(Token t) throws RegexException {
-        // if we matched every token, we've finished regex, so it passes
-        return t == null || t.match(this);
-
-    }
 
     void recordGroup(int paren, int text_end) {
         groups.set(paren, text.substring(parenPosition.get(paren), text_end));

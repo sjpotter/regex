@@ -21,7 +21,7 @@ class CloseParenToken extends Token {
         if (capturing)
             m.recordGroup(matched.pos, text_pos);
 
-        boolean ret = m.match(next);
+        boolean ret = next.match(m);
         if (capturing && !ret)
             m.unsetGroup(matched.pos);
 
