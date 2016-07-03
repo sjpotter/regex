@@ -8,10 +8,10 @@ import java.util.*;
 public class Regex {
     private Token t;
 
-    private SortedMap<Integer, String> groups;
-    private ArrayList<String> matches;
+    ArrayList<String> groups;
     Stack<CloseParenToken> closeParens;
     String text;
+    final private int parenCount;
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
@@ -27,7 +27,7 @@ public class Regex {
                     System.out.println(text + " matched regex " + regex);
                     System.out.println("Groups:");
                     int i = 0;
-                    for(String match : matcher.matches) {
+                    for(String match : matcher.groups) {
                         System.out.println(i++ + ": " + match);
                     }
                 } else {
@@ -41,7 +41,9 @@ public class Regex {
 
     @SuppressWarnings("WeakerAccess") // Needs to be public to be usable elsewhere
     public Regex(String r) throws RegexException {
-        t = (new Tokenizer(r)).tokenize();
+        Tokenizer tokenizer = new Tokenizer(r);
+        t = tokenizer.tokenize();
+        parenCount = tokenizer.parenCount;
     }
 
     /*
@@ -69,17 +71,12 @@ public class Regex {
      */
     @SuppressWarnings("WeakerAccess") // Need to be public to be usable elsewhere
     public boolean match(String text) throws RegexException {
-        groups      = new TreeMap<>();
-        matches     = null;
+        groups      = new ArrayList<>(Arrays.asList(new String[parenCount]));
         closeParens = new Stack<>();
         this.text   = text;
 
         for(int i=0; i < text.length() || i == 0; i++) { //need to test empty text string too
             if (match(t, i)) {
-                matches = new ArrayList<>(groups.size());
-                for(int key : groups.keySet()) {
-                    matches.add(groups.get(key));
-                }
                 return true;
             }
         }
@@ -109,6 +106,6 @@ public class Regex {
     }
 
     void recordGroup(int paren_pos, int text_start, int text_end) {
-        groups.put(paren_pos, text.substring(text_start, text_end));
+        groups.set(paren_pos, text.substring(text_start, text_end));
     }
 }

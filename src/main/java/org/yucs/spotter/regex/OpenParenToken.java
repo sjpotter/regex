@@ -9,7 +9,7 @@ class OpenParenToken extends Token {
     int text_pos = -1;
     private final CloseParenToken matched;
 
-    private List<Token> alts = new LinkedList<>();
+    final private List<Token> alts = new LinkedList<>();
 
     OpenParenToken(int p, CloseParenToken cp) {
         pos = p;

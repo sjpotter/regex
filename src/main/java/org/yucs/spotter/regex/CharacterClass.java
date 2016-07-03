@@ -1,6 +1,8 @@
 package org.yucs.spotter.regex;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
 
 class CharacterClass {
     private boolean all = false;
@@ -9,10 +11,24 @@ class CharacterClass {
     private final HashSet<Character> characters = new HashSet<>();
     private final HashSet<Character> negated = new HashSet<>();
 
-    private static final String digits = "0-9";
-    private static final String lower = "a-z";
-    private static final String upper = "A-Z";
-    private static final char[] whitespace = {' ', '\t','\r', '\n', '\f'};
+    private static final Set<Character> digits = new HashSet<>();
+    private static final Set<Character> lower = new HashSet<>();
+    private static final Set<Character> upper = new HashSet<>();
+    private static final Set<Character> words = new HashSet<>();
+
+    static {
+        for(char c='0'; c <= '9'; c++) {
+            digits.add(c);
+        }
+        for(char c='a'; c <= 'z'; c++) {
+            lower.add(c);
+            upper.add(Character.toUpperCase(c));
+        }
+        words.addAll(digits);
+        words.addAll(lower);
+        words.addAll(upper);
+    }
+    private static final Set<Character> whitespace = new HashSet<>(Arrays.asList(new Character[] {' ', '\t','\r', '\n', '\f'}));
 
     CharacterClass(String str, int beg, int end) throws RegexException {
         int i = beg;
@@ -114,40 +130,33 @@ class CharacterClass {
                 characters.add(')');
                 break;
             case 'd':
-                parseRange(negate, digits, 0);
+                addSet(negate, digits);
                 break;
             case 'D':
-                parseRange(!negate, digits, 0);
+                addSet(!negate, digits);
                 break;
             case 'w':
-                parseRange(negate, digits, 0);
-                parseRange(negate, upper, 0);
-                parseRange(negate, lower, 0);
+                addSet(negate, words);
                 break;
             case 'W':
-                parseRange(!negate, digits, 0);
-                parseRange(!negate, upper, 0);
-                parseRange(!negate, lower, 0);
+                addSet(!negate, words);
                 break;
             case 's':
-                for (char c : whitespace) {
-                    if (!negate)
-                        characters.add(c);
-                    else
-                        negated.add(c);
-                }
+                addSet(negate, whitespace);
                 break;
             case 'S':
-                for (char c : whitespace) {
-                    if (!negate)
-                        negated.add(c);
-                    else
-                        characters.add(c);
-                }
+                addSet(!negate, whitespace);
                 break;
             default:
                 throw new RegexException("parseSlash: unknown slash case: " + s.charAt(pos + 1) + " at index: " + (pos+1));
         }
+    }
+
+    private void addSet(boolean negate, Set<Character> set) {
+        if (negate)
+            negated.addAll(set);
+        else
+            characters.addAll(set);
     }
 
     @Override

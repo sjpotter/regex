@@ -8,7 +8,9 @@ import java.util.Map;
 class Tokenizer {
     private final String regex;
 
-    private Map<Integer, CloseParenToken> cptMap = new HashMap<>();
+    int parenCount = 0;
+
+    final private Map<Integer, CloseParenToken> cptMap = new HashMap<>();
 
     Tokenizer(String r) {
         regex = r;
@@ -54,6 +56,28 @@ class Tokenizer {
             cpt.matched = t;
 
             tokenize(endParen, end);
+
+            return t;
+        }
+
+        if (regex.charAt(regex_pos) == '\\'  && (regex.charAt(regex_pos+1) == 'b' || regex.charAt(regex_pos+1) == 'B')) {
+            Token t = new AnchorToken(regex.charAt(regex_pos+1));
+            t.next = tokenize(regex_pos+2, end);
+
+            return t;
+        }
+
+        if (regex.charAt(regex_pos) == '\\' && Character.isDigit(regex.charAt(regex_pos+1))) {
+            regex_pos++;
+            int val = Character.digit(regex.charAt(regex_pos), 10);
+            while (Character.isDigit(regex.charAt(regex_pos+1))) {
+                regex_pos++;
+                val *= 10;
+                val += Character.digit(regex.charAt(regex_pos), 10);
+            }
+
+            Token t = new BackReferenceToken(val);
+            t.next = tokenize(regex_pos+1, end);
 
             return t;
         }
@@ -117,7 +141,7 @@ class Tokenizer {
 
         List<Integer> pipes = findPipes(start, endParen);
 
-        OpenParenToken t = new OpenParenToken(start, cpt);
+        OpenParenToken t = new OpenParenToken(parenCount++, cpt);
 
         for (int pipe : pipes) {
             t.addAlt(tokenize(start, pipe));
