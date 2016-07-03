@@ -21,9 +21,6 @@ class OpenParenToken extends Token {
         alts.add(t);
     }
 
-    // TODO: Unsure how to display
-    public String toString() { return "Group"; }
-
     @Override
     public boolean match(Matcher m) throws RegexException {
         Iterator<Token> it = alts.iterator();

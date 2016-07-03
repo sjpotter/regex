@@ -7,14 +7,6 @@ class CharacterToken extends Token {
         this.c = c;
     }
 
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-
-        if (c == null) throw new AssertionError();
-
-        return "CharacterClass: " + c.toString();
-    }
-
     @Override
     public boolean match(Matcher m) throws RegexException {
         String text = m.getText();

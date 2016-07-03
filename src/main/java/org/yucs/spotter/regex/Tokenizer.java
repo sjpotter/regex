@@ -12,12 +12,17 @@ class Tokenizer {
 
     final private Map<Integer, CloseParenToken> cptMap = new HashMap<>();
 
+    private Token t = null;
+
     Tokenizer(String r) {
         regex = r;
     }
 
     Token tokenize() throws RegexException {
-        return tokenize(0, regex.length());
+        if (t == null)
+            t = tokenize(0, regex.length());
+
+        return t;
     }
 
     private Token tokenize(int regex_pos, int end) throws RegexException {

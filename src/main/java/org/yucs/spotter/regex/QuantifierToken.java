@@ -28,7 +28,7 @@ class QuantifierToken extends Token {
         Stack<Integer> text_pos = new Stack<>();
         int old_text_pos = m.getTextPosition();
 
-        // as greedy, match as much as possible
+        // as greedy, match as much as possible and record backtrack positions
         for(int i=0; i < q.max-q.min || q.max == -1; i++) {
             if (m.match(t)) {
                 text_pos.push(old_text_pos);
@@ -38,7 +38,7 @@ class QuantifierToken extends Token {
             }
         }
 
-        // try to match from here (consumed as much as possible) and if can't, back off one by one until minimum match
+        // try to match from here, but manual backtrack is necessary
         while (text_pos.size() > 0) {
             if (m.match(next)) {
                 return true;

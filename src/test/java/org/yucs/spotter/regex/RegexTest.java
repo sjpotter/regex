@@ -168,5 +168,4 @@ public class RegexTest {
         Regex r = new Regex("^(abc|def|(hij*|kl*m)nop)qrs$");
         assertTrue(r.match("hijjnopqrs"));
     }
-
 }

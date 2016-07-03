@@ -35,7 +35,6 @@ public class Regex {
         }
     }
 
-//    @SuppressWarnings("WeakerAccess") // Needs to be public to be usable elsewhere
     public Regex(String r) throws RegexException {
         String regex = '(' + r + ')';
 

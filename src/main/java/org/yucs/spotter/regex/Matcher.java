@@ -78,4 +78,8 @@ public class Matcher {
 
         return groups.get(pos);
     }
+
+    public void unsetGroup(int pos) {
+        groups.set(pos, null);
+    }
 }
