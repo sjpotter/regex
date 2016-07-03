@@ -24,6 +24,7 @@ class CharacterClass {
             lower.add(c);
             upper.add(Character.toUpperCase(c));
         }
+
         words.addAll(digits);
         words.addAll(lower);
         words.addAll(upper);

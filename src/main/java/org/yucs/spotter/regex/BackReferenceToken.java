@@ -5,7 +5,6 @@ class BackReferenceToken extends Token {
 
     BackReferenceToken(int val) {
         backreference = val;
-
     }
 
     @Override

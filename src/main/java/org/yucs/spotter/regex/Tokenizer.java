@@ -25,25 +25,35 @@ class Tokenizer {
             return null;
         }
 
+        // start of line anchor token
         if (regex.charAt(regex_pos) == '^') {
             Token t = new AnchorToken('^');
             t.next = tokenize(regex_pos + 1, end);
             return t;
         }
 
+        // end of line anchor token
         if (regex.charAt(regex_pos) == '$') {
             Token t = new AnchorToken('$');
             t.next = tokenize(regex_pos + 1, end);
             return t;
         }
 
-        if (regex.charAt(regex_pos) == ')') {
-            Token t = cptMap.get(regex_pos);
-            t.next = tokenize(regex_pos + 1, end);
-
+        // word boundary anchor token
+        if (regex.charAt(regex_pos) == '\\'  && (regex.charAt(regex_pos+1) == 'b' || regex.charAt(regex_pos+1) == 'B')) {
+            Token t = new AnchorToken(regex.charAt(regex_pos+1));
+            t.next = tokenize(regex_pos+2, end);
             return t;
         }
 
+        // end group token
+        if (regex.charAt(regex_pos) == ')') {
+            Token t = cptMap.get(regex_pos);
+            t.next = tokenize(regex_pos + 1, end);
+            return t;
+        }
+
+        // start group token
         if (regex.charAt(regex_pos) == '(') {
             int endParen = findMatchingParen(regex_pos);
 
@@ -60,13 +70,7 @@ class Tokenizer {
             return t;
         }
 
-        if (regex.charAt(regex_pos) == '\\'  && (regex.charAt(regex_pos+1) == 'b' || regex.charAt(regex_pos+1) == 'B')) {
-            Token t = new AnchorToken(regex.charAt(regex_pos+1));
-            t.next = tokenize(regex_pos+2, end);
-
-            return t;
-        }
-
+        // Backreference token
         if (regex.charAt(regex_pos) == '\\' && Character.isDigit(regex.charAt(regex_pos+1))) {
             regex_pos++;
             int val = Character.digit(regex.charAt(regex_pos), 10);
@@ -78,10 +82,10 @@ class Tokenizer {
 
             Token t = new BackReferenceToken(val);
             t.next = tokenize(regex_pos+1, end);
-
             return t;
         }
 
+        // regular character matching token
         CharacterClassFactory ccf = CharacterClassFactory.getCharacterClass(regex, regex_pos);
         regex_pos = ccf.regex_pos;
 
@@ -94,7 +98,6 @@ class Tokenizer {
 
         Token t = new CharacterToken(ccf.c, q);
         t.next = tokenize(regex_pos, end);
-
         return t;
     }
 
