@@ -4,6 +4,7 @@ class CharacterToken extends Token {
     private final CharacterClass c;
 
     CharacterToken(CharacterClass c) {
+        super();
         this.c = c;
     }
 

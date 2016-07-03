@@ -4,6 +4,7 @@ class AnchorToken extends Token {
     private final char anchor;
 
     AnchorToken(char a) {
+        super();
         this.anchor = a;
     }
 

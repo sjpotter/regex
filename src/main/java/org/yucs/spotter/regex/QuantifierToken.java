@@ -7,6 +7,8 @@ class QuantifierToken extends Token {
     private final Token t;
 
     QuantifierToken(Quantifier q, Token t) {
+        super();
+
         this.q = q;
         this.t = t;
     }

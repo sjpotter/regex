@@ -13,6 +13,8 @@ class OpenParenToken extends Token {
     final private List<Token> alts = new LinkedList<>();
 
     OpenParenToken(int p, CloseParenToken cp) {
+        super();
+
         pos = p;
         matched = cp;
     }

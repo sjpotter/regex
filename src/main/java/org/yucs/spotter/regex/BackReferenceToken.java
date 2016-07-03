@@ -4,6 +4,7 @@ class BackReferenceToken extends Token {
     private final int backreference;
 
     BackReferenceToken(int val) {
+        super();
         backreference = val;
     }
 
