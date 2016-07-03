@@ -9,7 +9,6 @@ public class Regex {
     private Token t;
 
     ArrayList<String> groups;
-    Stack<CloseParenToken> closeParens;
     String text;
     int text_pos;
     final private int parenCount;
@@ -73,7 +72,6 @@ public class Regex {
     @SuppressWarnings("WeakerAccess") // Need to be public to be usable elsewhere
     public boolean match(String text) throws RegexException {
         groups      = new ArrayList<>(Arrays.asList(new String[parenCount]));
-        closeParens = new Stack<>();
         this.text   = text;
 
         for(int i=0; i < text.length() || i == 0; i++) { //need to test empty text string too
@@ -95,15 +93,8 @@ public class Regex {
      */
     boolean match(Token t) throws RegexException {
         // if we matched every token, we've finished regex, so it passes
-        if (t == null) {
-            if (closeParens.size() == 0) { // only finished if no paren (i.e. after alternatives enclosed in a group (|)
-                return true;
-            } else { // if finished the token set of the alternative, continue after the alternative
-                t = closeParens.pop();
-            }
-        }
+        return t == null || t.match(this);
 
-        return t.match(this);
     }
 
     void recordGroup(int paren_pos, int text_start, int text_end) {

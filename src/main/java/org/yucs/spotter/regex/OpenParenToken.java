@@ -29,12 +29,11 @@ class OpenParenToken extends Token {
 
         this.text_pos = r.text_pos;
 
-        r.closeParens.push(matched);
-
         while (it.hasNext()) {
             Token t = it.next();
             if (r.match(t))
-                return true;
+                if (r.match(next))
+                    return true;
         }
 
         return false;
