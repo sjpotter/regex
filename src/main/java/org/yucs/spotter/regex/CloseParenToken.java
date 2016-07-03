@@ -9,6 +9,7 @@ class CloseParenToken extends Token {
     @SuppressWarnings("WeakerAccess") // TODO: will eventually have non capturing parens
     CloseParenToken(boolean capturing) {
         this.capturing = capturing;
+        next = NullToken.Instance;
     }
 
     CloseParenToken() {

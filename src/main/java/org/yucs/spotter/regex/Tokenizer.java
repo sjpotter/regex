@@ -86,6 +86,8 @@ class Tokenizer {
             regex_pos = ccf.regex_pos;
         }
 
+        t.next = NullToken.Instance;
+
         QuantifierFactory qf = QuantifierFactory.parse(regex, regex_pos);
         if (qf != null) {
             t = new QuantifierToken(qf.q, t);

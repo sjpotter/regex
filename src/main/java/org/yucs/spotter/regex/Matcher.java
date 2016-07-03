@@ -41,6 +41,22 @@ public class Matcher {
         return false;
     }
 
+    /**
+     * @return a List of all capture groups.  Groups captured will have a String, groups not captured will have a null
+     */
+    public List<String> getGroups() { return groups; }
+
+    /**
+     * @param pos The capturing group to retrieve
+     * @return The String from text captured by this group or null if the group wasn't executed in the match
+     * @throws RegexException
+     */
+    public String getGroup(int pos) throws RegexException {
+        if (pos >= groups.size())
+            throw new RegexException("Group " + pos + " does not exit");
+
+        return groups.get(pos);
+    }
 
     void recordGroup(int paren, int text_end) {
         groups.set(paren, text.substring(parenPosition.get(paren), text_end));
@@ -57,15 +73,6 @@ public class Matcher {
     String getText() { return text; }
 
     void setParenPosition(int paren, int pos) { parenPosition.set(paren, pos); }
-
-    public List<String> getGroups() { return groups; }
-
-    public String getGroup(int pos) throws RegexException {
-        if (pos >= groups.size())
-            throw new RegexException("Group " + pos + " does not exit");
-
-        return groups.get(pos);
-    }
 
     public void unsetGroup(int pos) {
         groups.set(pos, null);
