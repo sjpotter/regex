@@ -17,33 +17,38 @@ class AnchorToken extends Token {
         String text = m.getText();
         int text_pos = m.getTextPosition();
 
-        if (anchor == '$') {
-            return text.length() == text_pos && next.match(m);
-        } else if (anchor == '^') {
-            return text_pos == 0 && next.match(m);
-        } else if (anchor == 'b' || anchor == 'B') {
-            boolean negative = false;
+        switch (anchor) {
+            case '$':
+                return text_pos == text.length() && next.match(m);
 
-            if (anchor == 'B')
-                negative = true;
+            case '^':
+                return 0 == text_pos && next.match(m);
 
-            if (text_pos == 0) {
-                if (Character.isAlphabetic(text.charAt(text_pos)))
-                    return !negative && next.match(m);
-            } else if (text_pos == text.length()) {
-                if (Character.isAlphabetic(text.charAt(text_pos - 1))) {
-                    return !negative && next.match(m);
+            case 'b':
+            case 'B': {
+                boolean negative = false;
+                if (anchor == 'B')
+                    negative = true;
+
+                if (text_pos == 0) {
+                    if (Character.isAlphabetic(text.charAt(text_pos)))
+                        return !negative && next.match(m);
+                } else if (text_pos == text.length()) {
+                    if (Character.isAlphabetic(text.charAt(text_pos - 1))) {
+                        return !negative && next.match(m);
+                    }
+                } else {
+                    if ((Character.isWhitespace(text.charAt(text_pos - 1)) && Character.isAlphabetic(text.charAt(text_pos))) ||
+                            (Character.isWhitespace(text.charAt(text_pos)) && Character.isAlphabetic(text.charAt(text_pos - 1)))) {
+                        return !negative && next.match(m);
+                    }
                 }
-            } else {
-                if ((Character.isWhitespace(text.charAt(text_pos - 1)) && Character.isAlphabetic(text.charAt(text_pos))) ||
-                    (Character.isWhitespace(text.charAt(text_pos)) && Character.isAlphabetic(text.charAt(text_pos - 1)))) {
-                    return !negative && next.match(m);
-                }
+
+                return negative && next.match(m);
             }
 
-            return negative && next.match(m);
-        } else {
-            throw new RegexException("Unexpected ANCHOR token: " + anchor);
+            default:
+                throw new RegexException("Unexpected ANCHOR token: " + anchor);
         }
     }
 }
