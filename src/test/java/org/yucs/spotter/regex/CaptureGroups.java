@@ -32,4 +32,13 @@ public class CaptureGroups {
         assertTrue(m.match("\\abc"));
         assertEquals(m.getGroup(1), "abc");
     }
+
+    @Test
+    public void backReference() throws Exception {
+        Regex r = new Regex("^(.)\\1$");
+        Matcher m = r.Matcher();
+        assertTrue(m.match("aa"));
+        assertEquals(m.getGroup(0), "aa");
+        assertEquals(m.getGroup(1), "a");
+    }
 }

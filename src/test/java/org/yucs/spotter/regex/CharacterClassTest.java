@@ -109,5 +109,12 @@ public class CharacterClassTest {
 
         assertTrue(c1.match('a'));
         assertFalse(c1.match('1'));
+
+        c1 = new CharacterClass("\\|", 0, 1);
+        assertTrue(c1.match('|'));
+        c1 = new CharacterClass("\\(", 0, 1);
+        assertTrue(c1.match('('));
+        c1 = new CharacterClass("\\)", 0, 1);
+        assertTrue(c1.match(')'));
     }
 }
