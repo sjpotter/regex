@@ -10,9 +10,11 @@ class LookAheadExpressionToken extends Token {
     @Override
     public boolean match(Matcher m) throws RegexException {
         int pos = m.getTextPosition();
+
         boolean ret = t.match(m);
+
         m.setTextPosition(pos);
 
-        return next.match(m);
+        return ret && next.match(m);
     }
 }

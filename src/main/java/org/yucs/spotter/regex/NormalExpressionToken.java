@@ -13,14 +13,6 @@ class NormalExpressionToken extends ExpressionToken {
     final private int pos;
     final private boolean capturing;
 
-    NormalExpressionToken(int p, boolean c) {
-        super();
-
-        pos = p;
-        capturing = c;
-
-    }
-
     NormalExpressionToken(int p) {
         pos = p;
 
