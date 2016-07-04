@@ -36,9 +36,7 @@ public class Regex {
     }
 
     public Regex(String r) throws RegexException {
-        String regex = '(' + r + ')';
-
-        tokenizer = new Tokenizer(regex);
+        tokenizer = new Tokenizer(r);
         tokenizer.tokenize();
     }
 

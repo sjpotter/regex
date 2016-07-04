@@ -1,16 +1,11 @@
 package org.yucs.spotter.regex;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 class Tokenizer {
     private final String regex;
 
     int captureCount = 0;
-
-    final private Map<Integer, CloseParenToken> cptMap = new HashMap<>();
 
     private Token t = null;
 
@@ -20,7 +15,7 @@ class Tokenizer {
 
     Token tokenize() throws RegexException {
         if (t == null)
-            t = tokenize(0, regex.length());
+            t = createExpressionToken(0, regex.length());
 
         return t;
     }
@@ -48,9 +43,6 @@ class Tokenizer {
             t = new AnchorToken(regex.charAt(regex_pos+1));
             t.next = tokenize(regex_pos+2, end);
             return t;
-        } else if (regex.charAt(regex_pos) == ')') {
-            // end group token
-            return cptMap.get(regex_pos);
         }
 
         // Quantifiable regex tokens, return at end when quantifier is parsed if present
@@ -58,12 +50,7 @@ class Tokenizer {
             // start group token
             int endParen = findMatchingParen(regex_pos);
 
-            //need to be able to match parens in the regex
-            CloseParenToken cpt = new CloseParenToken();
-            cptMap.put(endParen, cpt);
-
-            t = createParenToken(regex_pos, endParen + 1, cpt);
-            cpt.matched = (OpenParenToken) t;
+            t = createExpressionToken(regex_pos+1, endParen);
 
             regex_pos = endParen + 1;
         } else if (regex.charAt(regex_pos) == '\\' && (regex_pos+1 < regex.length() && Character.isDigit(regex.charAt(regex_pos+1)))) {
@@ -99,17 +86,29 @@ class Tokenizer {
     }
 
     private int findMatchingParen(int start) throws RegexException {
-        LinkedList<Integer> parens = new LinkedList<>();
-        for(int i = start; i < regex.length(); i++) {
-            if (regex.charAt(i) == '(' && (i == 0 || regex.charAt(i-1) != '\\')) {
-                parens.push(i);
-            }
-            if (regex.charAt(i) == ')' && regex.charAt(i-1) != '\\') {
-                if (parens.size() == 0) // this is probably impossible if we start ther string with a '('
-                    throw new RegexException("unbalanced parens");
-                parens.pop();
-                if (parens.size() == 0)
-                    return i;
+        Stack<Integer> parens = new Stack<>();
+
+        // by reading the first character first, can make the switch in loop simpler as don't have to check if index 0
+        parens.push(start);
+
+        boolean slashIsEscape = false;
+        for(int i = start+1; i < regex.length(); i++) {
+            switch (regex.charAt(i)) {
+                case '\\':
+                    slashIsEscape = !slashIsEscape;
+                    break;
+                case '(':
+                    if (!slashIsEscape || regex.charAt(i-1) != '\\') {
+                        parens.push(i);
+                    }
+                    break;
+                case ')':
+                    if (!slashIsEscape || regex.charAt(i-1) != '\\') {
+                        parens.pop();
+                    }
+                    if (parens.size() == 0)
+                        return i;
+                    break;
             }
         }
 
@@ -118,37 +117,63 @@ class Tokenizer {
 
     private List<Integer> findPipes(int start, int end) throws RegexException {
         LinkedList<Integer> parens = new LinkedList<>();
-        LinkedList<Integer> alternates = new LinkedList<>();
+        LinkedList<Integer> pipes = new LinkedList<>();
 
-        for(int i=start; i < end-1; i++) { //last element should be a paren
-            if (regex.charAt(i) == '|' && (i == start || regex.charAt(i-1) != '\\') && parens.size() == 0) {
-                alternates.addLast(i);
-            } else if (regex.charAt(i) == '(' && (i == start || regex.charAt(i-1) != '\\')) {
-                parens.push(i);
-            } else if  (regex.charAt(i) == ')' && (i == start || regex.charAt(i-1) != '\\')) {
-                if (parens.size() == 0) {
-                    throw new RegexException("unbalanced parens");
-                }
-                parens.pop();
+        // by reading the first character first, can make the switch in loop simpler as don't have to check if index 0
+        boolean slashIsEscape = false;
+        switch (regex.charAt(start)) {
+            case '\\':
+                slashIsEscape = true;
+                break;
+            case '|':
+                pipes.add(start);
+                break;
+            case '(':
+                parens.add(start);
+                break;
+            case ')':
+                throw new RegexException("unbalanced parens");
+        }
+
+        // As we are searching for alternates, only find pipes that are not in sub expressions (i.e. surrounded by ()
+        for(int i=start+1; i < end; i++) { //last element should be a paren
+            switch (regex.charAt(i)) {
+                case '\\':
+                    slashIsEscape = !slashIsEscape;
+                    break;
+                case '(':
+                    if (!slashIsEscape || regex.charAt(i-1) != '\\') {
+                        parens.push(i);
+                    }
+                    break;
+                case ')':
+                    if (!slashIsEscape || regex.charAt(i-1) != '\\') {
+                        if (parens.size() == 0)
+                            throw new RegexException("unbalanced parens");
+                        parens.pop();
+                    }
+                    break;
+                case '|':
+                    if ((!slashIsEscape || regex.charAt(i-1) != '\\') && parens.size() == 0) {
+                        pipes.addLast(i);
+                    }
             }
         }
 
-        return alternates;
+        return pipes;
     }
 
-    private OpenParenToken createParenToken(int regex_pos, int endParen, CloseParenToken cpt) throws RegexException {
-        int start = regex_pos + 1;
+    private ExpressionToken createExpressionToken(int regex_pos, int endParen) throws RegexException {
+        List<Integer> pipes = findPipes(regex_pos, endParen);
 
-        List<Integer> pipes = findPipes(start, endParen);
-
-        OpenParenToken t = new OpenParenToken(captureCount++, cpt);
+        ExpressionToken t = new ExpressionToken(captureCount++);
 
         for (int pipe : pipes) {
-            t.addAlt(tokenize(start, pipe));
-            start = pipe + 1;
+            t.addAlt(tokenize(regex_pos, pipe));
+            regex_pos = pipe + 1;
         }
 
-        t.addAlt(tokenize(start, endParen));
+        t.addAlt(tokenize(regex_pos, endParen));
 
         return t;
     }

@@ -1,13 +1,10 @@
 package org.yucs.spotter.regex;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @SuppressWarnings("WeakerAccess")
 public class Matcher {
-    private ArrayList<String> groups;
-    private ArrayList<Integer> parenPosition;
+    private Map<Integer, Stack<String>> groups;
     private String text;
     private int text_pos;
     final private int parenCount;
@@ -27,8 +24,10 @@ public class Matcher {
      * @throws RegexException
      */
     public boolean match(String text) throws RegexException {
-        groups        = new ArrayList<>(Arrays.asList(new String[parenCount]));
-        parenPosition = new ArrayList<>(Arrays.asList(new Integer[parenCount]));
+        groups        = new HashMap<>();
+        for(int i=0; i < parenCount; i++) {
+            groups.put(i, new Stack<String>());
+        }
         this.text     = text;
 
         for(int i=0; i < text.length() || i == 0; i++) { //need to test empty text string too
@@ -44,7 +43,19 @@ public class Matcher {
     /**
      * @return a List of all capture groups.  Groups captured will have a String, groups not captured will have a null
      */
-    public List<String> getGroups() { return groups; }
+    public List<String> getGroups() {
+        ArrayList<String> ret = new ArrayList<>(parenCount);
+
+        for(int i=0; i < parenCount; i++) {
+            if (groups.get(i).size() == 0) {
+                ret.add(null);
+            } else {
+                ret.add(groups.get(i).peek());
+            }
+        }
+
+        return ret;
+    }
 
     /**
      * @param pos The capturing group to retrieve
@@ -55,11 +66,18 @@ public class Matcher {
         if (pos >= groups.size())
             throw new RegexException("Group " + pos + " does not exit");
 
-        return groups.get(pos);
+        return groups.get(pos).peek();
     }
 
-    void recordGroup(int paren, int text_end) {
-        groups.set(paren, text.substring(parenPosition.get(paren), text_end));
+    void pushGroup(int paren, String rec) {
+        groups.get(paren).push(rec);
+    }
+
+    void popGroup(int paren) {
+        if (paren >= 0) {
+            if (groups.get(paren).size() > 0)
+                groups.get(paren).pop();
+        }
     }
 
     int getTextPosition() {
@@ -71,10 +89,4 @@ public class Matcher {
     }
 
     String getText() { return text; }
-
-    void setParenPosition(int paren, int pos) { parenPosition.set(paren, pos); }
-
-    public void unsetGroup(int pos) {
-        groups.set(pos, null);
-    }
 }

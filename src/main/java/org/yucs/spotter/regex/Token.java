@@ -9,4 +9,7 @@ abstract class Token {
         next = NullToken.Instance;
     }
 
+    int captureGroup() {
+        return -1;
+    }
 }

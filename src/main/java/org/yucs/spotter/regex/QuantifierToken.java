@@ -26,6 +26,13 @@ class QuantifierToken extends Token {
         return matchNotGreedy(m);
     }
 
+    /*
+        Greedy matching is complicated as can't use the function call stack for back tracking
+        Therefore, we have 2 stacks, one as part of the Greedy function (text_pos) that allows us to reset
+        the place we are matching in the text when we backtrack and the capturedGroup stack which is part of
+        the Matcher class.
+     */
+
     private boolean matchGreedy(Matcher m) throws RegexException {
         Stack<Integer> text_pos = new Stack<>();
         int old_text_pos = m.getTextPosition();
@@ -46,6 +53,7 @@ class QuantifierToken extends Token {
                 return true;
             }
             m.setTextPosition(text_pos.pop());
+            m.popGroup(t.captureGroup());
         }
 
         return next.match(m);
@@ -53,6 +61,7 @@ class QuantifierToken extends Token {
 
     private boolean matchNotGreedy(Matcher m) throws RegexException {
         for(int i=0; i <= q.max-q.min || q.max == -1; i++) {
+            int pos = m.getTextPosition();
             // try to match from here (starting with minimum match, adding one by one if can't match)
             if (next.match(m)) { // matched the minimum, see if the rest of text matches the rest of the regex
                 return true;
@@ -60,6 +69,7 @@ class QuantifierToken extends Token {
 
             // couldn't match rest of regex against rest of text
             // so now try to match one more (till maximum/infinity) before we retry
+            m.setTextPosition(pos);
             if (!t.match(m))
                 return false;
         }
