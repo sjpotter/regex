@@ -15,7 +15,7 @@ class Tokenizer {
 
     Token tokenize() throws RegexException {
         if (t == null)
-            t = createExpressionToken(0, regex.length());
+            t = createNormalExpressionToken(captureCount++, 0, regex.length());
 
         return t;
     }
@@ -49,9 +49,21 @@ class Tokenizer {
         if (regex.charAt(regex_pos) == '(') {
             // start group token
             int endParen = findMatchingParen(regex_pos);
+            if (regex.charAt(regex_pos+1) == '?') {
+                switch (regex.charAt(regex_pos+2)) {
+                    case '>':
+                        t = createAtomicExpressionToken(regex_pos+3, endParen);
+                        break;
+                    case '=':
+                        t = createLookAheadExpressionToken(regex_pos+3, endParen);
+                        break;
+                    default:
+                        throw new RegexException("Unknown grouping type");
+                }
 
-            t = createExpressionToken(regex_pos+1, endParen);
-
+            } else {
+                t = createNormalExpressionToken(captureCount++, regex_pos+1, endParen);
+            }
             regex_pos = endParen + 1;
         } else if (regex.charAt(regex_pos) == '\\' && (regex_pos+1 < regex.length() && Character.isDigit(regex.charAt(regex_pos+1)))) {
             // Backreference token
@@ -163,10 +175,30 @@ class Tokenizer {
         return pipes;
     }
 
-    private ExpressionToken createExpressionToken(int regex_pos, int endParen) throws RegexException {
-        List<Integer> pipes = findPipes(regex_pos, endParen);
+    private Token createLookAheadExpressionToken(int regex_pos, int endParen) throws RegexException {
+        NormalExpressionToken net = createNormalExpressionToken(-1, regex_pos, endParen);
+        return new LookAheadExpressionToken(net);
+    }
 
-        ExpressionToken t = new ExpressionToken(captureCount++);
+
+    private NormalExpressionToken createNormalExpressionToken(int capturePos, int regex_pos, int endParen) throws RegexException {
+        NormalExpressionToken t = new NormalExpressionToken(capturePos);
+        parseExpression(t, regex_pos, endParen);
+
+        return t;
+    }
+
+
+    private Token createAtomicExpressionToken(int regex_pos, int endParen) throws RegexException {
+        AtomicExpressionToken t = new AtomicExpressionToken();
+        parseExpression(t, regex_pos, endParen);
+
+        return t;
+
+    }
+
+    private void parseExpression(ExpressionToken t, int regex_pos, int endParen) throws RegexException {
+        List<Integer> pipes = findPipes(regex_pos, endParen);
 
         for (int pipe : pipes) {
             t.addAlt(tokenize(regex_pos, pipe));
@@ -174,7 +206,5 @@ class Tokenizer {
         }
 
         t.addAlt(tokenize(regex_pos, endParen));
-
-        return t;
     }
 }

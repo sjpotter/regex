@@ -184,4 +184,20 @@ public class RegexTest {
         assertFalse(r.match("abc"));
         assertFalse(r.match("abc ab"));
     }
+
+    @Test
+    public void atomicGrouping() throws Exception {
+        Regex r = new Regex("a(?>bc|b)c");
+        assertTrue(r.match("abcc"));
+        assertFalse(r.match("abc"));
+    }
+
+    @Test
+    public void lookAhead() throws Exception {
+        Regex r = new Regex("(?=regex)regex(abc)");
+        Matcher m = r.Matcher();
+        assertTrue(m.match("regexabc"));
+        assertEquals(m.getGroup(0), "regexabc");
+        assertEquals(m.getGroup(1), "abc");
+    }
 }

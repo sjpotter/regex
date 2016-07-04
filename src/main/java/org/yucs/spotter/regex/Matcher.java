@@ -28,7 +28,7 @@ public class Matcher {
         for(int i=0; i < parenCount; i++) {
             groups.put(i, new Stack<String>());
         }
-        this.text     = text;
+        this.text = text;
 
         for(int i=0; i < text.length() || i == 0; i++) { //need to test empty text string too
             text_pos = i;
