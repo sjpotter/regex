@@ -168,4 +168,20 @@ public class RegexTest {
         Regex r = new Regex("^(abc|def|(hij*|kl*m)nop)qrs$");
         assertTrue(r.match("hijjnopqrs"));
     }
+
+    @Test
+    public void wordBoundaries() throws Exception {
+        Regex r = new Regex("\\babc");
+        assertTrue(r.match("abc"));
+        assertTrue(r.match("ab abc"));
+        r = new Regex("\\Babc");
+        assertFalse(r.match("abc"));
+        assertFalse(r.match("ab abc"));
+        r = new Regex("abc\\b");
+        assertTrue(r.match("abc"));
+        assertTrue(r.match("abc ab"));
+        r = new Regex("abc\\B");
+        assertFalse(r.match("abc"));
+        assertFalse(r.match("abc ab"));
+    }
 }

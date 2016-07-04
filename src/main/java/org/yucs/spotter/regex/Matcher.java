@@ -66,6 +66,9 @@ public class Matcher {
         if (pos >= groups.size())
             throw new RegexException("Group " + pos + " does not exit");
 
+        if (groups.get(pos).size() == 0)
+            return null;
+
         return groups.get(pos).peek();
     }
 

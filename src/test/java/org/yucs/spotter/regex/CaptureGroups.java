@@ -2,8 +2,7 @@ package org.yucs.spotter.regex;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class CaptureGroups {
     @Test
@@ -40,5 +39,21 @@ public class CaptureGroups {
         assertTrue(m.match("aa"));
         assertEquals(m.getGroup(0), "aa");
         assertEquals(m.getGroup(1), "a");
+        assertFalse(m.match("ab"));
+    }
+
+    @Test
+    public void nullBackReference() throws Exception {
+        Regex r = new Regex("^(a|(.))\\2$");
+        assertTrue(r.match("aa"));
+    }
+
+    @Test
+    public void shouldBeNull() throws Exception {
+        Regex r = new Regex("^(.)abc$");
+        Matcher m = r.Matcher();
+        assertFalse(m.match("defg"));
+        assertNull(m.getGroup(0));
+        assertNull(m.getGroup(1));
     }
 }

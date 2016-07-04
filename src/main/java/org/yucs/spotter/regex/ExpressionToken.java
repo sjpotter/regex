@@ -36,6 +36,9 @@ class ExpressionToken extends Token {
                 m.pushGroup(pos, m.getText().substring(start, m.getTextPosition()));
                 if (next.match(m))
                     return true;
+
+                //failed, reset text position for next alternate
+                m.setTextPosition(start);
                 m.popGroup(pos);
             }
         }
