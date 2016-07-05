@@ -87,9 +87,9 @@ class Tokenizer {
                                     t.next = tokenize(endParen+1, end, true);
                                     return t;
                                 case '!':
-//                                    t = createLookBehindExpressionToken(regex_pos+4, endParen, false);
-//                                    t.next = tokenize(endParen+1, end, true);
-//                                    return t;
+                                    t = createLookBehindExpressionToken(regex_pos+4, endParen, false);
+                                    t.next = tokenize(endParen+1, end, true);
+                                    return t;
                                 default:
                                     throw new RegexException("Unknown lookbehind grouping");
                             }
