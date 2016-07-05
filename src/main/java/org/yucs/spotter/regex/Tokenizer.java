@@ -73,20 +73,23 @@ class Tokenizer {
                         case '>':
                             t = createAtomicExpressionToken(regex_pos+3, endParen);
                             break;
-                        case '=':
+                        case '=':  // Positive Look Ahead
                             t = createLookAheadExpressionToken(regex_pos+3, endParen, true);
-                            break;
-                        case '!':
+                            // Look Aheads don't make sense to be quantified, position resets after they are done
+                            t.next = tokenize(endParen + 1, end, true);
+                            return t;
+                        case '!': // Negative Look Ahead
                             t = createLookAheadExpressionToken(regex_pos+3, endParen, false);
-                            break;
+                            t.next = tokenize(endParen + 1, end, true);
+                            return t;
                         case '<':
-                            // TODO: These probably aren't quantifiable
                             switch (regex.charAt(regex_pos+3)) {
-                                case '=':
+                                case '=': // Positive Look Behind
                                     t = createLookBehindExpressionToken(regex_pos+4, endParen, true);
+                                    // Look Behinds don't make sense to be quantified, position resets after they are done
                                     t.next = tokenize(endParen+1, end, true);
                                     return t;
-                                case '!':
+                                case '!': // Negative Look Behind
                                     t = createLookBehindExpressionToken(regex_pos+4, endParen, false);
                                     t.next = tokenize(endParen+1, end, true);
                                     return t;
