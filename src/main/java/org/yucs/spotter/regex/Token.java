@@ -6,10 +6,16 @@ abstract class Token {
     abstract boolean match(Matcher m) throws RegexException;
 
     Token reverse() throws RegexException {
-        if (next == NullToken.Instance)
-            return this;
+        return reverse(this);
+    }
 
-        Token prev = next.reverse();
+    Token reverse(Token cur) throws RegexException {
+        if (cur.next == NullToken.Instance)
+            return cur;
+
+        Token prev = cur.next.reverse();
+        cur.next = NullToken.Instance;
+
         Token tmp = prev;
         while (tmp.next != NullToken.Instance)
             tmp = tmp.next;

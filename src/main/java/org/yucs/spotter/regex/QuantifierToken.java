@@ -80,16 +80,7 @@ class QuantifierToken extends Token {
     @Override
     Token reverse() throws RegexException {
         QuantifierToken cur = new QuantifierToken(q, t.reverse());
-        if (next == NullToken.Instance) {
-            return cur;
-        }
 
-        Token prev = next.reverse();
-        Token tmp = prev;
-        while (tmp.next != NullToken.Instance)
-            tmp = tmp.next;
-        tmp.next = cur;
-
-        return prev;
+        return super.reverse(cur);
     }
 }

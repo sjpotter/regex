@@ -26,6 +26,7 @@ abstract class ExpressionToken extends Token {
     @Override
     Token reverse() throws RegexException {
         interalReverse();
+
         return super.reverse();
     }
 
