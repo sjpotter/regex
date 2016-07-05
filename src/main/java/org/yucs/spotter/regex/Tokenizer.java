@@ -276,22 +276,6 @@ class Tokenizer {
         return new LookBehindExpressionToken(t, positive);
     }
 
-    private Token reverse(Token t) {
-        Token prev    = NullToken.Instance;
-        Token current = t;
-        Token next;
-
-        while (current != NullToken.Instance)
-        {
-            next  = current.next;
-            current.next = prev;
-            prev = current;
-            current = next;
-        }
-
-        return prev;
-    }
-
     private NormalExpressionToken createNormalExpressionToken(int capturePos, int regex_pos, int endParen) throws RegexException {
         NormalExpressionToken t = new NormalExpressionToken(capturePos);
         if (capturePos != -1) {
