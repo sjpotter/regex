@@ -6,7 +6,7 @@ class Tokenizer {
     private final String regex;
 
     int captureCount = 0;
-    Map<Integer, NormalExpressionToken> captureMap = new HashMap<>();
+    final Map<Integer, NormalExpressionToken> captureMap = new HashMap<>();
 
     private Token t = null;
 
@@ -74,10 +74,25 @@ class Tokenizer {
                             t = createAtomicExpressionToken(regex_pos+3, endParen);
                             break;
                         case '=':
-                            t = createLookAheadExpressionToken(regex_pos+3, endParen);
+                            t = createLookAheadExpressionToken(regex_pos+3, endParen, true);
                             break;
                         case '!':
-                            throw new RegexException("LookBehind not supported yet");
+                            t = createLookAheadExpressionToken(regex_pos+3, endParen, false);
+                            break;
+                        case '<':
+                            // TODO: These probably aren't quantifiable
+                            switch (regex.charAt(regex_pos+3)) {
+                                case '=':
+                                    t = createLookBehindExpressionToken(regex_pos+4, endParen, true);
+                                    t.next = tokenize(endParen+1, end, true);
+                                    return t;
+                                case '!':
+//                                    t = createLookBehindExpressionToken(regex_pos+4, endParen, false);
+//                                    t.next = tokenize(endParen+1, end, true);
+//                                    return t;
+                                default:
+                                    throw new RegexException("Unknown lookbehind grouping");
+                            }
                         case '(':
                             t = createIfThenElseToken(regex_pos + 2, endParen);
                             if (nextToken)
@@ -249,11 +264,33 @@ class Tokenizer {
         return new IfThenElseToken(ifToken, thenToken, elseToken);
     }
 
-    private Token createLookAheadExpressionToken(int regex_pos, int endParen) throws RegexException {
+    private Token createLookAheadExpressionToken(int regex_pos, int endParen, boolean positive) throws RegexException {
         NormalExpressionToken net = createNormalExpressionToken(-1, regex_pos, endParen);
-        return new LookAheadExpressionToken(net);
+        return new LookAheadExpressionToken(net, positive);
     }
 
+    private Token createLookBehindExpressionToken(int regex_pos, int endParen, boolean positive) throws RegexException {
+        NormalExpressionToken t = createNormalExpressionToken(-1, regex_pos, endParen);
+        t.interalReverse();
+
+        return new LookBehindExpressionToken(t, positive);
+    }
+
+    private Token reverse(Token t) {
+        Token prev    = NullToken.Instance;
+        Token current = t;
+        Token next;
+
+        while (current != NullToken.Instance)
+        {
+            next  = current.next;
+            current.next = prev;
+            prev = current;
+            current = next;
+        }
+
+        return prev;
+    }
 
     private NormalExpressionToken createNormalExpressionToken(int capturePos, int regex_pos, int endParen) throws RegexException {
         NormalExpressionToken t = new NormalExpressionToken(capturePos);

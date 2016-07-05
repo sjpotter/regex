@@ -19,4 +19,9 @@ class RecursiveToken extends Token {
 
         return ret;
     }
+
+    @Override
+    Token reverse() throws RegexException {
+        throw new RegexException("Can't LookBehind with Recursive Tokens");
+    }
 }

@@ -76,4 +76,20 @@ class QuantifierToken extends Token {
 
         return false; // finished the max quantifier without finding regex match with the rest of the text
     }
+
+    @Override
+    Token reverse() throws RegexException {
+        QuantifierToken cur = new QuantifierToken(q, t.reverse());
+        if (next == NullToken.Instance) {
+            return cur;
+        }
+
+        Token prev = next.reverse();
+        Token tmp = prev;
+        while (tmp.next != NullToken.Instance)
+            tmp = tmp.next;
+        tmp.next = cur;
+
+        return prev;
+    }
 }

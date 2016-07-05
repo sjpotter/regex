@@ -22,4 +22,20 @@ class IfThenElseToken extends Token {
 
         return elseToken.match(m);
     }
+
+    @Override
+    Token reverse() throws RegexException {
+        Token cur = new IfThenElseToken(ifToken.reverse(), thenToken.reverse(), elseToken.reverse());
+
+        if (next == NullToken.Instance)
+            return cur;
+
+        Token prev = next.reverse();
+        Token tmp = prev;
+        while (tmp.next != NullToken.Instance)
+            tmp = tmp.next;
+        tmp.next = cur;
+
+        return prev;
+    }
 }

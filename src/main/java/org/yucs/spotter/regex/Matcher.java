@@ -10,7 +10,7 @@ public class Matcher {
 
     final private int parenCount;
     final private Map<Integer, NormalExpressionToken> captureMap;
-
+    private int iterator = 1;
 
     private final Token t;
 
@@ -124,4 +124,7 @@ public class Matcher {
 
         return m;
     }
+
+    public int getIterator() { return iterator; }
+    public void setIterator(int i) { iterator = i; }
 }

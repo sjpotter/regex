@@ -20,5 +20,4 @@ class AtomicExpressionToken extends ExpressionToken {
 
         return false;
     }
-
 }
