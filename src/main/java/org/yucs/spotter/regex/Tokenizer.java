@@ -6,6 +6,7 @@ class Tokenizer {
     private final String regex;
 
     int captureCount = 0;
+    Map<Integer, Token> captureMap = new HashMap<>();
 
     private Token t = null;
 
@@ -75,13 +76,29 @@ class Tokenizer {
                         case '=':
                             t = createLookAheadExpressionToken(regex_pos+3, endParen);
                             break;
-                        default:
+                        case '!':
+                            throw new RegexException("LookBehind not supported yet");
+                        case '(':
                             t = createIfThenElseToken(regex_pos + 2, endParen);
                             if (nextToken)
                                 t.next = tokenize(endParen + 1, end, true);
                             return t;
-//                        default:
-//                            throw new RegexException("Unknown grouping type");
+                        case 'R':
+                        case '0':
+                        case '1':
+                        case '2':
+                        case '3':
+                        case '4':
+                        case '5':
+                        case '6':
+                        case '7':
+                        case '8':
+                        case '9':
+                            // RegexRecursion will go here (quantifiable!)
+                            t = createRecursiveToken(regex_pos+2, endParen);
+                            break;
+                        default:
+                            throw new RegexException("Unknown grouping type");
                     }
                 } else {
                     t = createNormalExpressionToken(captureCount++, regex_pos+1, endParen);
@@ -188,14 +205,32 @@ class Tokenizer {
         return pipes;
     }
 
-    private Token createIfThenElseToken(int regex_pos, int endParen) throws RegexException {
-        int ifEndParen = regex_pos;
-        if (regex.charAt(regex_pos) == '(')
-            ifEndParen = findMatchingParen(regex_pos);
+    private Token createRecursiveToken(int regex_pos, int endParen) throws RegexException {
+        int capture;
+        if (regex.charAt(regex_pos) == 'R' && regex_pos + 1 == endParen)
+            capture = 0;
+        else {
+            try {
+                capture = Integer.parseInt(regex.substring(regex_pos, endParen));
+            } catch (NumberFormatException e) {
+                throw new RegexException("createRecursiveToken: couldn't parse " + regex.substring(regex_pos, endParen) + " as int");
+            }
+        }
+        return new RecursiveToken(capture);
+    }
 
-        Token ifToken = tokenize(regex_pos, endParen, false); //createLookAheadExpressionToken(regex_pos+3, ifEndParen);
+    private Token createIfThenElseToken(int regex_pos, int endParen) throws RegexException {
+        int ifEndParen = findMatchingParen(regex_pos);
+
+        // Support testing if capture group exists.
+        Token ifToken = tokenize(regex_pos, ifEndParen, true);
         Token thenToken;
         Token elseToken;
+
+        if (ifToken instanceof NormalExpressionToken) {
+            captureCount--; // TODO: HACK as the tokenize on the () string above would have incremented
+            ifToken = new CaptureGroupTesterToken(regex.substring(regex_pos+1, ifEndParen));
+        }
 
         List<Integer> pipes = findPipes(ifEndParen+1, endParen);
         switch (pipes.size()) {
@@ -222,6 +257,9 @@ class Tokenizer {
 
     private NormalExpressionToken createNormalExpressionToken(int capturePos, int regex_pos, int endParen) throws RegexException {
         NormalExpressionToken t = new NormalExpressionToken(capturePos);
+        if (capturePos != -1) {
+            captureMap.put(capturePos, t);
+        }
         parseExpression(t, regex_pos, endParen);
 
         return t;

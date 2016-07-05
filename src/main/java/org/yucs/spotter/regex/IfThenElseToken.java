@@ -5,7 +5,10 @@ class IfThenElseToken extends Token {
     final private Token thenToken;
     final private Token elseToken;
 
-    IfThenElseToken(Token ifToken, Token thenToken, Token elseToken) {
+    IfThenElseToken(Token ifToken, Token thenToken, Token elseToken) throws RegexException {
+        if (!(ifToken instanceof TestableToken))
+            throw new RegexException("IfThenElseToken: ifToken not a TestableToken");
+
         this.ifToken = ifToken;
         this.thenToken = thenToken;
         this.elseToken = elseToken;

@@ -7,13 +7,29 @@ public class Matcher {
     private Map<Integer, Stack<String>> groups;
     private String text;
     private int text_pos;
+
     final private int parenCount;
+    final private Map<Integer, Token> captureMap;
+
 
     private final Token t;
 
     Matcher(Tokenizer tokenizer) throws RegexException {
         t = tokenizer.tokenize();
         parenCount = tokenizer.captureCount;
+        captureMap = tokenizer.captureMap;
+    }
+
+    private Matcher(int parenCount,  Map<Integer, Token> captureMap, String text) {
+        this.t = null;
+        this.parenCount = parenCount;
+        this.captureMap = captureMap;
+        this.text = text;
+
+        groups = new HashMap<>();
+        for(int i=0; i < parenCount; i++) {
+            groups.put(i, new Stack<String>());
+        }
     }
 
     /**
@@ -92,4 +108,18 @@ public class Matcher {
     }
 
     String getText() { return text; }
+
+    Token getCaptureToken(int pos) throws RegexException {
+        if (pos >= captureMap.size())
+            throw new RegexException("Trying to retrieve a token for a capture group that doesn't exist");
+
+        return captureMap.get(pos);
+    }
+
+    public Matcher copy() {
+        Matcher m = new Matcher(parenCount, captureMap, text);
+        m.setTextPosition(this.text_pos);
+
+        return m;
+    }
 }

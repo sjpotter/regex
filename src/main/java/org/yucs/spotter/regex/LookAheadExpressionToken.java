@@ -1,6 +1,6 @@
 package org.yucs.spotter.regex;
 
-class LookAheadExpressionToken extends Token {
+class LookAheadExpressionToken extends Token implements TestableToken {
     final private NormalExpressionToken t;
 
     LookAheadExpressionToken(NormalExpressionToken net) {
