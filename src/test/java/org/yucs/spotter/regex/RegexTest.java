@@ -200,4 +200,25 @@ public class RegexTest {
         assertEquals(m.getGroup(0), "regexabc");
         assertEquals(m.getGroup(1), "abc");
     }
+
+    @Test
+    public void ifThenElse() throws Exception {
+        Regex r = new Regex("^(?aa|b)$");
+        Matcher m = r.Matcher();
+        assertTrue(m.match("aa"));
+        assertTrue(m.getGroups().size() == 1);
+
+        assertTrue(m.match("b"));
+
+        r = new Regex("^(?aa)$");
+        m = r.Matcher();
+        assertTrue(m.match("aa"));
+
+        r = new Regex("^(?(?=regex)(regex)|(abc))$");
+        m = r.Matcher();
+        assertTrue(m.match("regex"));
+        assertEquals(m.getGroup(1), "regex");
+        assertTrue(m.match("abc"));
+        assertEquals(m.getGroup(2), "abc");
+    }
 }
