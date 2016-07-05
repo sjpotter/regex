@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class RegexTest {
+public class RegexTests {
     @Test
     public void dotMatch() throws Exception {
         Regex r = new Regex(".");
@@ -190,6 +190,11 @@ public class RegexTest {
         Regex r = new Regex("a(?>bc|b)c");
         assertTrue(r.match("abcc"));
         assertFalse(r.match("abc"));
+
+        r = new Regex("a(?>c|b)c");
+        assertTrue(r.match("acc"));
+        assertTrue(r.match("abc"));
+        assertFalse(r.match("aac"));
     }
 
     @Test

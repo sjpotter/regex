@@ -6,7 +6,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class RecursiveTest {
+public class RecursiveTests {
     @Test
     public void recursiveTest() throws Exception {
         Regex r = new Regex("a(?R)?z");

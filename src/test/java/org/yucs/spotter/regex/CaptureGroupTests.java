@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class CaptureGroups {
+public class CaptureGroupTests {
     @Test
     public void backtracking() throws Exception {
         Regex r = new Regex("^(aef.)*aefbaefcaefd$");
