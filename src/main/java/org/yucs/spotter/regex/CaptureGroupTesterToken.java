@@ -12,7 +12,7 @@ class CaptureGroupTesterToken extends Token implements TestableToken {
     }
 
     @Override
-    public boolean match(Matcher m) throws RegexException {
+    boolean match(Matcher m) throws RegexException {
         return m.getGroup(group) != null;
     }
 }

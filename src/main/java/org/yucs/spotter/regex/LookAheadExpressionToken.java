@@ -8,7 +8,7 @@ class LookAheadExpressionToken extends Token implements TestableToken {
     }
 
     @Override
-    public boolean match(Matcher m) throws RegexException {
+    boolean match(Matcher m) throws RegexException {
         int pos = m.getTextPosition();
 
         boolean ret = t.match(m);

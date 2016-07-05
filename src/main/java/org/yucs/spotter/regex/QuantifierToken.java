@@ -13,7 +13,7 @@ class QuantifierToken extends Token {
         this.t = t;
     }
 
-    public boolean match(Matcher m) throws RegexException {
+    boolean match(Matcher m) throws RegexException {
         // match minimum
         for (int i = 0; i < q.min; i++) {
             if (!t.match(m))

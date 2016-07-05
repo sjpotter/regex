@@ -4,7 +4,7 @@ import java.util.Iterator;
 
 class AtomicExpressionToken extends ExpressionToken {
     @Override
-    public boolean match(Matcher m) throws RegexException {
+    boolean match(Matcher m) throws RegexException {
         Iterator<Token> it = altIterator();
 
         int start = m.getTextPosition();

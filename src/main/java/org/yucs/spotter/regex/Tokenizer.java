@@ -6,7 +6,7 @@ class Tokenizer {
     private final String regex;
 
     int captureCount = 0;
-    Map<Integer, Token> captureMap = new HashMap<>();
+    Map<Integer, NormalExpressionToken> captureMap = new HashMap<>();
 
     private Token t = null;
 

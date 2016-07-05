@@ -9,7 +9,7 @@ class BackReferenceToken extends Token {
     }
 
     @Override
-    public boolean match(Matcher m) throws RegexException {
+    boolean match(Matcher m) throws RegexException {
         String text = m.getText();
         int text_pos = m.getTextPosition();
         String stored = m.getGroup(backreference);

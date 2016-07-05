@@ -15,7 +15,7 @@ class IfThenElseToken extends Token {
     }
 
     @Override
-    public boolean match(Matcher m) throws RegexException {
+    boolean match(Matcher m) throws RegexException {
         if (ifToken.match(m)) {
             return thenToken.match(m);
         }

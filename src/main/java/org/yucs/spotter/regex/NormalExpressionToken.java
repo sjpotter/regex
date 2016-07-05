@@ -1,8 +1,6 @@
 package org.yucs.spotter.regex;
 
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 
 // An Expression is a set of alternates
 // An alternate is a list of tokens that are matched in order
@@ -20,11 +18,20 @@ class NormalExpressionToken extends ExpressionToken {
     }
 
     @Override
-    public boolean match(Matcher m) throws RegexException {
-        return normalMatcher(m, true);
+    boolean match(Matcher m) throws RegexException {
+        return internalMatch(m, true);
     }
 
-    boolean normalMatcher(Matcher m, boolean goNext) throws RegexException {
+    boolean matchNoFollow(Matcher m) throws RegexException {
+        return internalMatch(m, false);
+    }
+
+    @Override
+    int captureGroup() {
+        return pos;
+    }
+
+    private boolean internalMatch(Matcher m, boolean goNext) throws RegexException {
         Iterator<Token> it = altIterator();
 
         int start = m.getTextPosition();
@@ -49,11 +56,5 @@ class NormalExpressionToken extends ExpressionToken {
         }
 
         return false;
-
-    }
-
-    @Override
-    int captureGroup() {
-        return pos;
     }
 }

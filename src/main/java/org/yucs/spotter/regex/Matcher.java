@@ -9,7 +9,7 @@ public class Matcher {
     private int text_pos;
 
     final private int parenCount;
-    final private Map<Integer, Token> captureMap;
+    final private Map<Integer, NormalExpressionToken> captureMap;
 
 
     private final Token t;
@@ -20,7 +20,7 @@ public class Matcher {
         captureMap = tokenizer.captureMap;
     }
 
-    private Matcher(int parenCount,  Map<Integer, Token> captureMap, Map<Integer, Stack<String>> groups, String text) {
+    private Matcher(int parenCount,  Map<Integer, NormalExpressionToken> captureMap, Map<Integer, Stack<String>> groups, String text) {
         this.t = null;
         this.parenCount = parenCount;
         this.captureMap = captureMap;
@@ -111,7 +111,7 @@ public class Matcher {
 
     String getText() { return text; }
 
-    Token getCaptureToken(int pos) throws RegexException {
+    NormalExpressionToken getCaptureToken(int pos) throws RegexException {
         if (pos >= captureMap.size())
             throw new RegexException("Trying to retrieve a token for a capture group that doesn't exist");
 
