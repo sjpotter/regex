@@ -24,4 +24,12 @@ public class RecursiveTest {
         assertEquals(m.getGroup(1), "a");
         assertEquals(m.getGroup(2), "a");
     }
+
+    @Test
+    public void broken() throws Exception {
+        Regex r = new Regex("^(.)(\\1)(?2)?b$");
+        // expects this to be 2 or more a's followed by a final b, but not working, as the recursion isn't just matching
+        // the capture token, but chains to b inside the recursion, which isn't correct
+        assertTrue(r.match("aaab"));
+    }
 }

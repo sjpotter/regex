@@ -20,15 +20,17 @@ public class Matcher {
         captureMap = tokenizer.captureMap;
     }
 
-    private Matcher(int parenCount,  Map<Integer, Token> captureMap, String text) {
+    private Matcher(int parenCount,  Map<Integer, Token> captureMap, Map<Integer, Stack<String>> groups, String text) {
         this.t = null;
         this.parenCount = parenCount;
         this.captureMap = captureMap;
         this.text = text;
 
-        groups = new HashMap<>();
+        this.groups = new HashMap<>();
         for(int i=0; i < parenCount; i++) {
-            groups.put(i, new Stack<String>());
+            Stack<String> newStack = new Stack<>();
+            newStack.addAll(groups.get(i));
+            this.groups.put(i, newStack);
         }
     }
 
@@ -117,7 +119,7 @@ public class Matcher {
     }
 
     public Matcher copy() {
-        Matcher m = new Matcher(parenCount, captureMap, text);
+        Matcher m = new Matcher(parenCount, captureMap, groups, text);
         m.setTextPosition(this.text_pos);
 
         return m;

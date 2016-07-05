@@ -11,7 +11,9 @@ class RecursiveToken extends Token {
     public boolean match(Matcher m) throws RegexException {
         Matcher m1 = m.copy();
 
-        boolean ret = m.getCaptureToken(captureGroup).match(m1);
+        NormalExpressionToken t = (NormalExpressionToken) m.getCaptureToken(captureGroup);
+
+        boolean ret = t.normalMatcher(m1, false);
         if (ret)
             m.setTextPosition(m1.getTextPosition());
 

@@ -21,6 +21,10 @@ class NormalExpressionToken extends ExpressionToken {
 
     @Override
     public boolean match(Matcher m) throws RegexException {
+        return normalMatcher(m, true);
+    }
+
+    boolean normalMatcher(Matcher m, boolean goNext) throws RegexException {
         Iterator<Token> it = altIterator();
 
         int start = m.getTextPosition();
@@ -30,6 +34,9 @@ class NormalExpressionToken extends ExpressionToken {
             if (t.match(m)) {
                 if (capturing)
                     m.pushGroup(pos, m.getText().substring(start, m.getTextPosition()));
+                if (!goNext)
+                    return true;
+
                 if (next.match(m))
                     return true;
 
@@ -42,6 +49,7 @@ class NormalExpressionToken extends ExpressionToken {
         }
 
         return false;
+
     }
 
     @Override
