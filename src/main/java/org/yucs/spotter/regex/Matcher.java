@@ -14,6 +14,8 @@ public class Matcher {
 
     private final Token t;
 
+    Stack<Token> nextStack;
+
     Matcher(Tokenizer tokenizer) throws RegexException {
         t = tokenizer.tokenize();
         parenCount = tokenizer.captureCount;
@@ -25,6 +27,7 @@ public class Matcher {
         this.parenCount = parenCount;
         this.captureMap = captureMap;
         this.text = text;
+        this.nextStack = new Stack<>();
 
         this.groups = new HashMap<>();
         for(int i=0; i < parenCount; i++) {
@@ -47,10 +50,12 @@ public class Matcher {
             groups.put(i, new Stack<String>());
         }
         this.text = text;
+        this.nextStack = new Stack<>();
 
         for(int i=0; i < text.length() || i == 0; i++) { //need to test empty text string too
             text_pos = i;
             if (t.match(this)) {
+                groups.get(0).push(text.substring(i, text_pos));
                 return true;
             }
         }

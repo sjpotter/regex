@@ -1,5 +1,7 @@
 package org.yucs.spotter.regex;
 
+import java.util.Stack;
+
 class IfThenElseToken extends Token {
     final private Token ifToken;
     final private Token thenToken;
@@ -16,11 +18,20 @@ class IfThenElseToken extends Token {
 
     @Override
     boolean match(Matcher m) throws RegexException {
-        if (ifToken.match(m)) {
-            return thenToken.match(m);
+        Stack<Token> savedStack = m.nextStack;
+        m.nextStack = new Stack<>();
+        boolean ret = ifToken.match(m);
+
+        m.nextStack = savedStack;
+
+        Token exec;
+        if (ret) {
+            exec = thenToken;
+        } else {
+            exec = elseToken;
         }
 
-        return elseToken.match(m);
+        return exec.match(m);
     }
 
     @Override

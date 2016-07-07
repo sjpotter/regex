@@ -5,7 +5,7 @@ class NullToken extends Token {
 
     @Override
     boolean match(Matcher m) throws RegexException {
-        return true;
+        return m.nextStack.size() == 0 || m.nextStack.pop().match(m);
     }
 
     @Override

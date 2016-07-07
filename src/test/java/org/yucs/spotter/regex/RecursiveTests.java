@@ -13,7 +13,7 @@ public class RecursiveTests {
         Matcher m = r.Matcher();
 
         assertTrue(m.match("aaazzz123"));
-        assertEquals(m.getGroup(0), "aaazzz");
+        assertEquals("aaazzz", m.getGroup(0));
 
         assertFalse(m.match("aaabbzzz"));
 

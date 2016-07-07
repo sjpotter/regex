@@ -13,6 +13,6 @@ class CaptureGroupTesterToken extends Token implements TestableToken {
 
     @Override
     boolean match(Matcher m) throws RegexException {
-        return m.getGroup(group) != null;
+        return m.getGroup(group) != null && next.match(m);
     }
 }

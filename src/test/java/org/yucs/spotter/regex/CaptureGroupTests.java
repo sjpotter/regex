@@ -21,7 +21,7 @@ public class CaptureGroupTests {
         Regex r = new Regex("^(aef.)*?aefbaefcaefd$");
         Matcher m = r.Matcher();
         assertTrue(m.match("aefaaefbaefcaefd"));
-        assertEquals(m.getGroup(1), "aefa");
+        assertEquals("aefa", m.getGroup(1));
     }
 
     @Test

@@ -152,12 +152,6 @@ public class RegexTests {
         assertTrue(r.match(";';'`@!#$@"));
         assertFalse(r.match("aefsa;213jkjsafs@!@$"));
 
-        r = new Regex("\\s+");
-        assertTrue(r.match("asdfd sdf"));
-        assertTrue(r.match("sdf\tadfsd"));
-        assertTrue(r.match("sdf\t\n32rfsf"));
-        assertFalse(r.match("Sdferfsd324"));
-
         r = new Regex("^\\S+$");
         assertTrue(r.match("Sdfs324"));
         assertFalse(r.match("sdfsd sdfsf"));
@@ -165,6 +159,15 @@ public class RegexTests {
 
     @Test
     public void broken() throws Exception {
+        Regex r = new Regex("\\s+");
+        assertTrue(r.match("asdfd sdf"));
+        assertTrue(r.match("sdf\tadfsd"));
+        assertTrue(r.match("sdf\t\n32rfsf"));
+        assertFalse(r.match("Sdferfsd324"));
+    }
+
+    @Test
+    public void fixed() throws Exception {
         Regex r = new Regex("^(abc|def|(hij*|kl*m)nop)qrs$");
         assertTrue(r.match("hijjnopqrs"));
     }

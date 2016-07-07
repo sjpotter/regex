@@ -44,19 +44,19 @@ class Tokenizer {
                     t.next = tokenize(regex_pos + 1, end, true);
                 return t;
             case '\\':
-                if (regex_pos+1 < regex.length() && (regex.charAt(regex_pos+1) == 'b' || regex.charAt(regex_pos+1) == 'B')) {
+                if (regex_pos + 1 < regex.length() && (regex.charAt(regex_pos + 1) == 'b' || regex.charAt(regex_pos + 1) == 'B')) {
                     // word boundary anchor token
-                    t = new AnchorToken(regex.charAt(regex_pos+1));
+                    t = new AnchorToken(regex.charAt(regex_pos + 1));
                     if (nextToken)
-                        t.next = tokenize(regex_pos+2, end, true);
+                        t.next = tokenize(regex_pos + 2, end, true);
                     return t;
                 }
 
-                if (regex_pos+1 < regex.length() && Character.isDigit(regex.charAt(regex_pos+1))) {
+                if (regex_pos + 1 < regex.length() && Character.isDigit(regex.charAt(regex_pos + 1))) {
                     // Backreference token
                     regex_pos++;
                     int val = Character.digit(regex.charAt(regex_pos), 10);
-                    while (Character.isDigit(regex.charAt(regex_pos+1))) {
+                    while (Character.isDigit(regex.charAt(regex_pos + 1))) {
                         regex_pos++;
                         val *= 10;
                         val += Character.digit(regex.charAt(regex_pos), 10);
@@ -68,30 +68,30 @@ class Tokenizer {
                 break;
             case '(':
                 int endParen = findMatchingParen(regex_pos);
-                if (regex.charAt(regex_pos+1) == '?') {
-                    switch (regex.charAt(regex_pos+2)) {
+                if (regex.charAt(regex_pos + 1) == '?') {
+                    switch (regex.charAt(regex_pos + 2)) {
                         case '>':
-                            t = createAtomicExpressionToken(regex_pos+3, endParen);
+                            t = createAtomicExpressionToken(regex_pos + 3, endParen);
                             break;
                         case '=':  // Positive Look Ahead
-                            t = createLookAheadExpressionToken(regex_pos+3, endParen, true);
+                            t = createLookAheadExpressionToken(regex_pos + 3, endParen, true);
                             // Look Aheads don't make sense to be quantified, position resets after they are done
                             t.next = tokenize(endParen + 1, end, true);
                             return t;
                         case '!': // Negative Look Ahead
-                            t = createLookAheadExpressionToken(regex_pos+3, endParen, false);
+                            t = createLookAheadExpressionToken(regex_pos + 3, endParen, false);
                             t.next = tokenize(endParen + 1, end, true);
                             return t;
                         case '<':
-                            switch (regex.charAt(regex_pos+3)) {
+                            switch (regex.charAt(regex_pos + 3)) {
                                 case '=': // Positive Look Behind
-                                    t = createLookBehindExpressionToken(regex_pos+4, endParen, true);
+                                    t = createLookBehindExpressionToken(regex_pos + 4, endParen, true);
                                     // Look Behinds don't make sense to be quantified, position resets after they are done
-                                    t.next = tokenize(endParen+1, end, true);
+                                    t.next = tokenize(endParen + 1, end, true);
                                     return t;
                                 case '!': // Negative Look Behind
-                                    t = createLookBehindExpressionToken(regex_pos+4, endParen, false);
-                                    t.next = tokenize(endParen+1, end, true);
+                                    t = createLookBehindExpressionToken(regex_pos + 4, endParen, false);
+                                    t.next = tokenize(endParen + 1, end, true);
                                     return t;
                                 default:
                                     throw new RegexException("Unknown lookbehind grouping");
@@ -113,13 +113,16 @@ class Tokenizer {
                         case '8':
                         case '9':
                             // RegexRecursion will go here (quantifiable!)
-                            t = createRecursiveToken(regex_pos+2, endParen);
+                            t = createRecursiveToken(regex_pos + 2, endParen);
                             break;
                         default:
                             throw new RegexException("Unknown grouping type");
                     }
                 } else {
-                    t = createNormalExpressionToken(captureCount++, regex_pos+1, endParen);
+                    int capture = captureCount++;
+                    t = new StartCaptureToken();
+                    t.next = createNormalExpressionToken(capture, regex_pos + 1, endParen);
+                    t.next.next = new EndCaptureToken(t, capture);
                 }
                 regex_pos = endParen + 1;
         }
@@ -132,16 +135,19 @@ class Tokenizer {
             regex_pos = ccf.regex_pos;
         }
 
-        t.next = NullToken.Instance;
+        Token next = t;
+         while (!(next.next instanceof NullToken))
+             next = next.next;
 
         QuantifierFactory qf = QuantifierFactory.parse(regex, regex_pos);
         if (qf != null) {
             t = new QuantifierToken(qf.q, t);
             regex_pos = qf.regex_pos;
+            next = t;
         }
 
         if (nextToken)
-            t.next = tokenize(regex_pos, end, true);
+            next.next = tokenize(regex_pos, end, true);
         return t;
     }
 
@@ -280,7 +286,7 @@ class Tokenizer {
     }
 
     private NormalExpressionToken createNormalExpressionToken(int capturePos, int regex_pos, int endParen) throws RegexException {
-        NormalExpressionToken t = new NormalExpressionToken(capturePos);
+        NormalExpressionToken t = new NormalExpressionToken();
         if (capturePos != -1) {
             captureMap.put(capturePos, t);
         }
