@@ -103,6 +103,12 @@ class CharacterClass {
         }
 
         switch (s.charAt(pos + 1)) {
+            case '.':
+                characters.add('.');
+                break;
+            case '-':
+                characters.add('-');
+                break;
             case '\\':
                 characters.add('\\');
                 break;

@@ -1,5 +1,6 @@
 package org.yucs.spotter.regex;
 
+//
 class BackReferenceToken extends Token {
     private final int backreference;
 
@@ -21,7 +22,8 @@ class BackReferenceToken extends Token {
         String text = m.getText();
         int text_pos = m.getTextPosition();
         String stored = m.getGroup(backreference);
-        if (stored == null)
+
+        if (stored == null) // TODO: unsure this is correct, maybe its an automatic and continue to next match
             return false;
 
         for(int i=0; i < stored.length(); i++) {
@@ -40,7 +42,8 @@ class BackReferenceToken extends Token {
         String text = m.getText();
         int text_pos = m.getTextPosition() - 1;
         String stored = m.getGroup(backreference);
-        if (stored == null)
+
+        if (stored == null) // TODO: unsure this is correct, maybe its an automatic and continue to next match
             return false;
 
         for(int i=stored.length() -1; i >= 0; i--) {
