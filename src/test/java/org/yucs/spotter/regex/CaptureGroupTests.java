@@ -40,6 +40,11 @@ public class CaptureGroupTests {
         assertEquals(m.getGroup(0), "aa");
         assertEquals(m.getGroup(1), "a");
         assertFalse(m.match("ab"));
+
+        r = new Regex("^(?>a|(.))\\1$");
+        m = r.Matcher();
+        assertFalse(m.match("aa"));
+        assertTrue(m.match("bb"));
     }
 
     @Test
