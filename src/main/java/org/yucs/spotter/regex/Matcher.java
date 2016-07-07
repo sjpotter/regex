@@ -45,14 +45,14 @@ public class Matcher {
      * @throws RegexException
      */
     public boolean match(String text) throws RegexException {
-        groups        = new HashMap<>();
-        for(int i=0; i < parenCount; i++) {
-            groups.put(i, new Stack<String>());
-        }
-        this.text = text;
-        this.nextStack = new Stack<>();
-
         for(int i=0; i < text.length() || i == 0; i++) { //need to test empty text string too
+            groups = new HashMap<>();
+            for(int j=0; j < parenCount; j++) {
+                groups.put(j, new Stack<String>());
+            }
+            this.text = text;
+            this.nextStack = new Stack<>();
+
             text_pos = i;
             if (t.match(this)) {
                 groups.get(0).push(text.substring(i, text_pos));
