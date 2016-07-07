@@ -132,4 +132,38 @@ public class Matcher {
 
     public int getIterator() { return iterator; }
     public void setIterator(int i) { iterator = i; }
+
+    Stack<Token> saveNextStack() {
+        Stack<Token> savedState = nextStack;
+        nextStack = new Stack<>();
+        nextStack.addAll(savedState);
+
+        return savedState;
+    }
+
+    Stack<Token> saveAndResetNextStack() {
+        Stack<Token> savedState = saveNextStack();
+        nextStack = new Stack<>();
+
+        return savedState;
+    }
+
+    void pushNextStack(Token t) {
+        nextStack.push(t);
+    }
+
+    Stack<Token> saveThenPushNextStack(Token t) {
+        Stack<Token> savedState = saveNextStack();
+        pushNextStack(t);
+
+        return savedState;
+    }
+
+    void restoreNextStack(Stack<Token> s) {
+        nextStack = s;
+    }
+
+    boolean matchNextStack() throws RegexException {
+        return nextStack.size() == 0 || nextStack.pop().match(this);
+    }
 }

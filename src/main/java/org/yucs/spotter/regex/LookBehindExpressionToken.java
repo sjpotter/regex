@@ -19,12 +19,11 @@ class LookBehindExpressionToken extends Token implements TestableToken {
         m.setIterator(-1);
 
         // Empty stack as only matters that its string of tokens match
-        Stack<Token> savedState = m.nextStack;
-        m.nextStack = new Stack<>();
+        Stack<Token> savedState = m.saveAndResetNextStack();
 
         boolean ret = t.match(m);
 
-        m.nextStack = savedState;
+        m.restoreNextStack(savedState);
 
         m.setIterator(1);
         m.setTextPosition(pos);

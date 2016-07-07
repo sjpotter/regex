@@ -20,12 +20,11 @@ class IfThenElseToken extends Token {
     boolean match(Matcher m) throws RegexException {
         // Empty stack for if clause, as only the tokens within it define true/false for the then/else clauses
 
-        Stack<Token> savedStack = m.nextStack;
-        m.nextStack = new Stack<>();
+        Stack<Token> savedStack = m.saveAndResetNextStack();
         boolean ret = ifToken.match(m);
 
         // stack is returned for then/else clause as they continue matching next tokens.
-        m.nextStack = savedStack;
+        m.restoreNextStack(savedStack);
         Token exec;
         if (ret) {
             exec = thenToken;

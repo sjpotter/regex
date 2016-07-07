@@ -3,7 +3,9 @@ package org.yucs.spotter.regex;
 import java.util.Stack;
 
 class QuantifierToken extends Token {
+    // Defines the quantification to be used
     private final Quantifier q;
+    // The token list that is being quantified
     private final Token t;
 
     QuantifierToken(Quantifier q, Token t) {
@@ -14,14 +16,15 @@ class QuantifierToken extends Token {
     }
 
     boolean match(Matcher m) throws RegexException {
-        // if haven't matched the minimum # of times yet, stick a decrement QuantifierToken on next stack and
+        // if haven't matched the minimum # of times yet, stick a decremented QuantifierToken on next stack and
         // try to match the token we are quantifying
         if (q.min != 0) {
-            m.nextStack.push(cloneDecrement());
+            m.pushNextStack(cloneDecrement());
             return t.match(m);
         }
 
-        if (q.max != 0) {
+        // We've matched the minimum needed (0 for *, 1 for + or if specified in {,} so now unto max
+        if (q.max != 0) { // max allows us to quantify more, so pick a strategy
             if (q.greedy)
                 return matchGreedy(m);
             else {
@@ -30,21 +33,20 @@ class QuantifierToken extends Token {
 
         }
 
+        // max doesn't allow us to quantify more
         return next.match(m);
     }
 
     private boolean matchGreedy(Matcher m) throws RegexException {
-        Stack<Token> savedState = m.nextStack;
-        m.nextStack = new Stack<>();
-        m.nextStack.addAll(savedState);
-
         int startPos = m.getTextPosition();
 
+        Stack<Token> savedState = m.saveThenPushNextStack(cloneDecrement());
+
         // try to match quantified token greedily, if greedily fails, go to next;
-        m.nextStack.push(cloneDecrement());
+
         boolean ret = t.match(m);
         if (!ret) {
-            m.nextStack = savedState;
+            m.restoreNextStack(savedState);
             m.setTextPosition(startPos);
             return next.match(m);
         }
@@ -53,18 +55,16 @@ class QuantifierToken extends Token {
     }
 
     private boolean matchNotGreedy(Matcher m) throws RegexException {
-        Stack<Token> savedState = m.nextStack;
-        m.nextStack = new Stack<>();
-        m.nextStack.addAll(savedState);
-
         int startPos = m.getTextPosition();
+
+        Stack<Token> savedState = m.saveNextStack();
 
         // try to match next, if that fails, try to match quantified token before trying again
         boolean ret = next.match(m);
         if (!ret) {
             m.setTextPosition(startPos);
-            m.nextStack = savedState;
-            m.nextStack.push(cloneDecrement());
+            m.restoreNextStack(savedState);
+            m.pushNextStack(cloneDecrement());
             return t.match(m);
         }
 
@@ -77,5 +77,4 @@ class QuantifierToken extends Token {
 
         return qt;
     }
-
 }

@@ -18,12 +18,11 @@ class LookAheadExpressionToken extends Token implements TestableToken {
         int pos = m.getTextPosition();
 
         // Empty stack as only matters that its string of tokens match
-        Stack<Token> savedState = m.nextStack;
-        m.nextStack = new Stack<>();
+        Stack<Token> savedState = m.saveAndResetNextStack();
 
         boolean ret = t.match(m);
 
-        m.nextStack = savedState;
+        m.restoreNextStack(savedState);
         m.setTextPosition(pos);
 
         if (positive) {

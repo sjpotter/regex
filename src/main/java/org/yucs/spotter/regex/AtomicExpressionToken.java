@@ -12,18 +12,17 @@ class AtomicExpressionToken extends ExpressionToken {
         int start = m.getTextPosition();
 
         while (it.hasNext()) {
-            Stack<Token> savedStack = m.nextStack;
-            m.nextStack = new Stack<>();
+            Stack<Token> savedStack = m.saveAndResetNextStack();
 
             Token t = it.next();
             boolean ret = t.match(m);
 
             if (ret) {
-                m.nextStack = savedStack;
+                m.restoreNextStack(savedStack);
                 return next.match(m);
             }
 
-            m.nextStack = savedStack;
+            m.restoreNextStack(savedStack);
             m.setTextPosition(start);
         }
 

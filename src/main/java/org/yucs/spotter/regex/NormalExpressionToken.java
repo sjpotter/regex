@@ -24,18 +24,16 @@ class NormalExpressionToken extends ExpressionToken {
         int start = m.getTextPosition();
 
         while (it.hasNext()) {
-            Stack<Token> savedStack = m.nextStack;
-            m.nextStack = new Stack<>();
-            m.nextStack.addAll(savedStack);
+            Stack<Token> savedStack = m.saveNextStack();
 
             if (goNext)
-                m.nextStack.push(next);
+                m.pushNextStack(next);
 
             Token t = it.next();
             if (t.match(m))
                 return true;
 
-            m.nextStack = savedStack;
+            m.restoreNextStack(savedStack);
             m.setTextPosition(start);
         }
 
