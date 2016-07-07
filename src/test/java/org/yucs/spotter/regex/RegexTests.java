@@ -158,7 +158,7 @@ public class RegexTests {
     }
 
     @Test
-    public void broken() throws Exception {
+    public void space() throws Exception {
         Regex r = new Regex("\\s+");
         assertTrue(r.match("asdfd sdf"));
         assertTrue(r.match("sdf\tadfsd"));
@@ -218,5 +218,11 @@ public class RegexTests {
         assertEquals(m.getGroup(1), "regex");
         assertTrue(m.match("abc"));
         assertEquals(m.getGroup(2), "abc");
+    }
+
+    @Test
+    public void broken() throws Exception {
+        Regex r = new Regex("^(abc|abcdef)*$");
+        assertTrue(r.match("abcabcdefabc"));
     }
 }
