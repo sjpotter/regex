@@ -14,10 +14,12 @@ class RecursiveToken extends Token {
         NormalExpressionToken t = m.getCaptureToken(captureGroup);
 
         boolean ret = t.matchNoFollow(m1);
-        if (ret)
-            m.setTextPosition(m1.getTextPosition());
+        if (!ret)
+            return false;
 
-        return ret;
+        m.setTextPosition(m1.getTextPosition());
+
+        return next.match(m);
     }
 
     @Override
