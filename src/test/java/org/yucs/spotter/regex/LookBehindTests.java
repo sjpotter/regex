@@ -28,9 +28,24 @@ public class LookBehindTests {
 
     // Implementation doesn't backtrack greedy correctly.
     @Test
-    public void broken() throws Exception {
+    public void lookBehindGroup() throws Exception {
         Regex r = new Regex("c(.*)(?<=\\1)b");
         Matcher m = r.Matcher();
         assertTrue(m.match("cab"));
+    }
+
+    @Test
+    public void lookBehindQuantifier() throws Exception {
+        Regex r = new Regex("(?<=.{3})(.*)");
+        Matcher m = r.Matcher();
+        assertFalse(m.match("a"));
+        assertFalse(m.match("ab"));
+        assertFalse(m.match("abc"));
+        assertTrue(m.match("abcd"));
+        assertEquals("d", m.getGroup(0));
+        assertEquals("d", m.getGroup(1));
+        assertTrue(m.match("abcde"));
+        assertEquals("de", m.getGroup(0));
+        assertEquals("de", m.getGroup(1));
     }
 }

@@ -6,7 +6,7 @@ class QuantifierToken extends Token {
     // Defines the quantification to be used
     private final Quantifier q;
     // The token list that is being quantified
-    private final Token t;
+    private Token t;
 
     QuantifierToken(Quantifier q, Token t) {
         super();
@@ -76,5 +76,11 @@ class QuantifierToken extends Token {
         qt.next = this.next;
 
         return qt;
+    }
+
+    Token reverse() throws RegexException {
+        t.reverse();
+
+        return super.reverse();
     }
 }
