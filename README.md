@@ -64,10 +64,27 @@ int matchstar(int c, char *regexp, char *text)
 }
 ```
 
+and the full matchhere function for this simple version of Rob Pike's code
+
+```c
+int matchhere(char *regexp, char *text)
+{
+    if (regexp[0] == '\0')
+        return 1;
+    if (regexp[1] == '*')
+        return matchstar(regexp[0], regexp+2, text);
+    if (*text!='\0' && (regexp[0]=='.' || regexp[0]==*text))
+        return matchhere(regexp+1, text+1);
+    return 0;
+}
+```
+
 ### My java Regex matcher
 
+I started off simply writing a matcher similar to Rob Pike's in java, but expanded on it to try to include the full world of
+perl type regular expression matching.
 
-
+---
 
 <a name="myfootnote1">1</a>: https://en.wikipedia.org/wiki/The_Practice_of_Programming
 
