@@ -12,7 +12,7 @@ abstract class ExpressionToken extends Token {
     }
     Iterator<Token> altIterator() { return alts.iterator(); }
 
-    void interalReverse() throws RegexException {
+    void internalReverse() throws RegexException {
         List<Token> newAlts = new LinkedList<>();
 
         for(Token t : alts) {
@@ -25,7 +25,7 @@ abstract class ExpressionToken extends Token {
 
     @Override
     Token reverse() throws RegexException {
-        interalReverse();
+        internalReverse();
 
         return super.reverse();
     }

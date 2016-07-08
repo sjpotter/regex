@@ -18,9 +18,8 @@ class EndCaptureToken extends Token {
         if (next.match(m))
             return true;
 
+        // this isn't a valid path, so this isn't a valid capture.
         m.popGroup(capture_pos);
-
-        // i.e. this isn't a valid path, so this isn't a valid capture.
         return false;
     }
 }

@@ -284,7 +284,7 @@ class Tokenizer {
 
     private Token createLookBehindExpressionToken(int regex_pos, int endParen, boolean positive) throws RegexException {
         NormalExpressionToken t = createNormalExpressionToken(-1, regex_pos, endParen);
-        t.interalReverse();
+        t.internalReverse();
 
         return new LookBehindExpressionToken(t, positive);
     }

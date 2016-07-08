@@ -19,7 +19,6 @@ class IfThenElseToken extends Token {
     @Override
     boolean match(Matcher m) throws RegexException {
         // Empty stack for if clause, as only the tokens within it define true/false for the then/else clauses
-
         Stack<Token> savedStack = m.saveAndResetNextStack();
         boolean ret = ifToken.match(m);
 
