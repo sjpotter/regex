@@ -9,17 +9,13 @@ class RecursiveToken extends Token {
 
     @Override
     boolean match(Matcher m) throws RegexException {
-        Matcher m1 = m.copy();
-
         NormalExpressionToken t = m.getCaptureToken(captureGroup);
 
-        boolean ret = t.matchNoFollow(m1);
-        if (!ret)
-            return false;
+        m.pushNextStack(new RecursiveEndToken(m, next));
 
-        m.setTextPosition(m1.getTextPosition());
+        Matcher m1 = m.copy();
 
-        return next.match(m);
+        return t.matchNoFollow(m1);
     }
 
     @Override

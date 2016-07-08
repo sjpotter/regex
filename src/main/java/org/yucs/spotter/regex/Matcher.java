@@ -123,11 +123,16 @@ public class Matcher {
         return captureMap.get(pos);
     }
 
-    public Matcher copy() {
+    Matcher copy() {
         Matcher m = new Matcher(parenCount, captureMap, groups, text);
         m.setTextPosition(this.text_pos);
-
+        m.nextStack = nextStack;
         return m;
+    }
+
+    void copy(Matcher m) {
+        setTextPosition(m.getTextPosition());
+        nextStack = m.nextStack;
     }
 
     public int getIterator() { return iterator; }

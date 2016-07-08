@@ -256,6 +256,10 @@ class Tokenizer {
             ifToken = new CaptureGroupTesterToken(regex.substring(regex_pos+1, ifEndParen));
         }
 
+        if (!(ifToken instanceof TestableToken)) {
+            throw new RegexException("Didn't parse a testable token from: " + regex.substring(regex_pos, ifEndParen));
+        }
+
         List<Integer> pipes = findPipes(ifEndParen+1, endParen);
         switch (pipes.size()) {
             case 0:
