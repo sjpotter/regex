@@ -99,7 +99,7 @@ abstract class Token {
 In general they implement the match function like
 
 ```java
-class ModelToken {
+class ModelToken extends Token {
     boolean match(Matcher m) throws RegexException {
         if (doesMatchText()) {
             return next.match(m);
@@ -128,6 +128,11 @@ continue matching with it and following it's next list until we reach it's NullT
 to follow the current nextStack, we can simply save and reset the stack while we follow that list, and restore the stack
 when the list is finished.  This is useful for IfThenElse regular expressions.  With this approach I was able to implement
 all or almost all of Perl's regular expression functionality.
+
+
+### Note
+
+- This code isn't meant for performance, besides for the fact that perl regular expressions
 
 ---
 <a name="myfootnote1">1</a>: https://en.wikipedia.org/wiki/The_Practice_of_Programming
