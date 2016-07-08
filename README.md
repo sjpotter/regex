@@ -132,10 +132,13 @@ all or almost all of Perl's regular expression functionality.
 
 ### Note
 
-- This code isn't meant for performance, besides for the fact that perl regular expressions
+- This code isn't meant for performance, besides for the fact that perl regular expressions aren't designed to be programmable
+as finite state automata<sup>[3](#myfootnote3)</sup> as normal regular languages should be,  this code is primarily meant to
+be easily understandable and I'll probably continue to revise to be as clear as I can make it and fix bugs discovered along the way
 
 ---
 <a name="myfootnote1">1</a>: https://en.wikipedia.org/wiki/The_Practice_of_Programming
 
 <a name="myfootnote2">2</a>: http://www.cs.princeton.edu/courses/archive/spr09/cos333/beautiful.html
 
+<a name="myfootnote3">3:</a>: https://swtch.com/~rsc/regexp/regexp1.html
