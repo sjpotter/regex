@@ -24,6 +24,7 @@ class IfThenElseToken extends Token {
 
         // stack is returned for then/else clause as they continue matching next tokens.
         m.restoreNextStack(savedStack);
+
         Token exec;
         if (ret) {
             exec = thenToken;

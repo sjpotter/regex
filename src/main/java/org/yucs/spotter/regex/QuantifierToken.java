@@ -43,7 +43,6 @@ class QuantifierToken extends Token {
         Stack<Token> savedState = m.saveThenPushNextStack(cloneDecrement());
 
         // try to match quantified token greedily, if greedily fails, go to next;
-
         boolean ret = t.match(m);
         if (!ret) {
             m.restoreNextStack(savedState);
@@ -59,7 +58,7 @@ class QuantifierToken extends Token {
 
         Stack<Token> savedState = m.saveNextStack();
 
-        // try to match next, if that fails, try to match quantified token before trying again
+        // try to match next, as not greedy, if that fails, try to match quantified token once before trying again
         boolean ret = next.match(m);
         if (!ret) {
             m.setTextPosition(startPos);

@@ -11,6 +11,8 @@ class RecursiveToken extends Token {
     boolean match(Matcher m) throws RegexException {
         NormalExpressionToken t = m.getCaptureToken(captureGroup);
 
+        // As recursive consumes state, need to have nextStack work correctly, this token resets the matcher state
+        // for future matches after it executes
         m.pushNextStack(new RecursiveEndToken(m, next));
 
         Matcher m1 = m.copy();

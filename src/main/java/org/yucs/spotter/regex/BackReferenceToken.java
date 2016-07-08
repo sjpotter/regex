@@ -1,6 +1,8 @@
 package org.yucs.spotter.regex;
 
-//
+/*
+ * BackReference gets the captured group state from a previous group and checks if the text matches that here
+ */
 class BackReferenceToken extends Token {
     private final int backreference;
 

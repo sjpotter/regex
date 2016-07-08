@@ -6,7 +6,6 @@ import java.util.Stack;
 // An Expression is a set of alternates
 // An alternate is a list of tokens that are matched in order
 // For an expression to be match, one of its alternates has to match
-// Expressions are currently always captured
 
 class NormalExpressionToken extends ExpressionToken {
     @Override

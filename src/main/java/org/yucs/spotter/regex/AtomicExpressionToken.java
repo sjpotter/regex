@@ -3,7 +3,10 @@ package org.yucs.spotter.regex;
 import java.util.Iterator;
 import java.util.Stack;
 
-// AtomicGroups are alternates where if an alternate matches, even if it fails later, the rest aren't tried
+/*
+ * AtomicGroups are alternates where if an alternate matches, even if it fails later, the rest aren't tried, i.e. no
+ * backtracking once an alternate matches
+ */
 
 class AtomicExpressionToken extends ExpressionToken {
     @Override

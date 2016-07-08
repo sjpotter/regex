@@ -1,5 +1,10 @@
 package org.yucs.spotter.regex;
 
+/*
+ * EndCapture saves the text between it and its matching StartCaptureToken.
+ * It also saves the previous state so if the matching along this path fails later, the state can be restored
+ */
+
 class EndCaptureToken extends Token {
     final private StartCaptureToken start;
     final private int capture_pos;
