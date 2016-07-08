@@ -84,8 +84,52 @@ int matchhere(char *regexp, char *text)
 I started off simply writing a matcher similar to Rob Pike's in java, but expanded on it to try to include the full world of
 perl type regular expression matching.
 
----
+The basic idea of this design is that a regex is tokenized and token are processed in order in a recursive manner.
 
+Namely every token class is derived from the base abstract class Token
+
+```java
+abstract class Token {
+    Token next = null;
+
+    abstract boolean match(Matcher m) throws RegexException;
+}
+```
+
+In general they implement the match function like
+
+```java
+class ModelToken {
+    boolean match(Matcher m) throws RegexException {
+        if (doesMatchText()) {
+            return next.match(m);
+        }
+
+        return false;
+    }
+}
+```
+
+So one gets a linked list of ```java Tokens``` that end in ```java NullToken``` which always returns true.
+
+But it's more complicated than this.
+
+Some Tokens are simple and behave in this manner (Character matching, Anchors...) But others can be considered complex
+tokens. i.e. they are Tokens that are made up of others Tokens.
+
+For example.  QuantifierToken (determining how many times a token should be repeated) is a token that has a list of tokens
+it is quantifying.  This list of tokens that belong to quantification is also a list that ends in the NullToken, but when
+we reach that Token, we would want to continue matching from QuantifierToken's next Token.
+
+To solve this, complex Tokens can add their next token or a special token they create on demand to the nextStack, which
+is a stack of tokens that determines what to do when we reach a NullToken.  If the stack is empty, we return true, just
+like before, as we have reached the end of the regular expression.  Otherwise we pop the top Token off the nextStack and
+continue matching with it and following it's next list until we reach it's NullToken.  If we don't want a list of tokens
+to follow the current nextStack, we can simply save and reset the stack while we follow that list, and restore the stack
+when the list is finished.  This is useful for IfThenElse regular expressions.  With this approach I was able to implement
+all or almost all of Perl's regular expression functionality.
+
+---
 <a name="myfootnote1">1</a>: https://en.wikipedia.org/wiki/The_Practice_of_Programming
 
 <a name="myfootnote2">2</a>: http://www.cs.princeton.edu/courses/archive/spr09/cos333/beautiful.html
