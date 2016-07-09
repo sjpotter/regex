@@ -141,4 +141,4 @@ be easily understandable and I'll probably continue to revise to be as clear as 
 
 <a name="myfootnote2">2</a>: http://www.cs.princeton.edu/courses/archive/spr09/cos333/beautiful.html
 
-<a name="myfootnote3">3:</a>: https://swtch.com/~rsc/regexp/regexp1.html
+<a name="myfootnote3">3</a>: https://swtch.com/~rsc/regexp/regexp1.html
