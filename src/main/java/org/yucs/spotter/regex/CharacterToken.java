@@ -21,7 +21,8 @@ class CharacterToken extends Token {
             text_pos--;
         }
 
-        if (text_pos < text.length()) {
+        // "< text.length()" for forward movement, ">= 0" for backwards movement
+        if (text_pos < text.length() && text_pos >= 0) {
             if (c.match(text.charAt(text_pos))) {
                 if (iterator == 1)
                     m.setTextPosition(text_pos+1);
