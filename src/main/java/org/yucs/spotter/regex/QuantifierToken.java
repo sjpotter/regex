@@ -8,7 +8,7 @@ class QuantifierToken extends Token {
     // Defines the quantification to be used
     final private Quantifier q;
     // The token list that is being quantified
-    private Token t;
+    final private Token t;
 
     final private boolean clone;
 

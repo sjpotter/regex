@@ -1,7 +1,5 @@
 package org.yucs.spotter.regex;
 
-import java.util.Stack;
-
 class StartCaptureToken extends Token {
     int start_pos;
 
