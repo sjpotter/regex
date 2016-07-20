@@ -61,25 +61,6 @@ class CharacterClass {
         all = true;
     }
 
-    public String toString() {
-        if (all)
-            return "<global>";
-
-        StringBuilder sb = new StringBuilder();
-
-        if (characters.size() > 0) {
-            sb.append("Positive: ").append(String.valueOf(characters));
-            if (negated.size() > 0) {
-                sb.append(" ");
-            }
-        }
-        if (negated.size() > 0) {
-            sb.append("Negative: ").append(String.valueOf(negated));
-        }
-
-        return sb.toString();
-    }
-
     public boolean match(char c) {
         return characters.contains(c) || (negated.size() > 0 && !negated.contains(c)) || all;
     }

@@ -21,7 +21,7 @@ class Tokenizer {
         return t;
     }
 
-    private Token tokenize(int regex_pos, int end, boolean nextToken) throws RegexException {
+    private Token tokenize(int regex_pos, int end) throws RegexException {
         Token t = null;
 
         if (regex_pos >= end) {
@@ -34,21 +34,18 @@ class Tokenizer {
             case '^':
                 // start of line anchor token
                 t = new AnchorToken('^');
-                if (nextToken)
-                    t.next = tokenize(regex_pos + 1, end, true);
+                t.next = tokenize(regex_pos + 1, end);
                 return t;
             case '$':
                 // end of line anchor token
                 t = new AnchorToken('$');
-                if (nextToken)
-                    t.next = tokenize(regex_pos + 1, end, true);
+                t.next = tokenize(regex_pos + 1, end);
                 return t;
             case '\\':
                 if (regex_pos + 1 < regex.length() && (regex.charAt(regex_pos + 1) == 'b' || regex.charAt(regex_pos + 1) == 'B')) {
                     // word boundary anchor token
                     t = new AnchorToken(regex.charAt(regex_pos + 1));
-                    if (nextToken)
-                        t.next = tokenize(regex_pos + 2, end, true);
+                    t.next = tokenize(regex_pos + 2, end);
                     return t;
                 }
 
@@ -76,30 +73,29 @@ class Tokenizer {
                         case '=':  // Positive Look Ahead
                             t = createLookAheadExpressionToken(regex_pos + 3, endParen, true);
                             // Look Aheads don't make sense to be quantified, position resets after they are done
-                            t.next = tokenize(endParen + 1, end, true);
+                            t.next = tokenize(endParen + 1, end);
                             return t;
                         case '!': // Negative Look Ahead
                             t = createLookAheadExpressionToken(regex_pos + 3, endParen, false);
-                            t.next = tokenize(endParen + 1, end, true);
+                            t.next = tokenize(endParen + 1, end);
                             return t;
                         case '<':
                             switch (regex.charAt(regex_pos + 3)) {
                                 case '=': // Positive Look Behind
                                     t = createLookBehindExpressionToken(regex_pos + 4, endParen, true);
                                     // Look Behinds don't make sense to be quantified, position resets after they are done
-                                    t.next = tokenize(endParen + 1, end, true);
+                                    t.next = tokenize(endParen + 1, end);
                                     return t;
                                 case '!': // Negative Look Behind
                                     t = createLookBehindExpressionToken(regex_pos + 4, endParen, false);
-                                    t.next = tokenize(endParen + 1, end, true);
+                                    t.next = tokenize(endParen + 1, end);
                                     return t;
                                 default:
                                     throw new RegexException("Unknown lookbehind grouping");
                             }
                         case '(':
                             t = createIfThenElseToken(regex_pos + 2, endParen);
-                            if (nextToken)
-                                t.next = tokenize(endParen + 1, end, true);
+                            t.next = tokenize(endParen + 1, end);
                             return t;
                         case 'R':
                         case '0':
@@ -135,19 +131,18 @@ class Tokenizer {
             regex_pos = ccf.regex_pos;
         }
 
-        Token next = t;
-         while (!(next.next instanceof NullToken))
-             next = next.next;
+        Token last = t;
+        while (!(last.next instanceof NullToken))
+             last = last.next;
 
         QuantifierFactory qf = QuantifierFactory.parse(regex, regex_pos);
         if (qf != null) {
             t = new QuantifierToken(qf.q, t);
             regex_pos = qf.regex_pos;
-            next = t;
+            last = t;
         }
 
-        if (nextToken)
-            next.next = tokenize(regex_pos, end, true);
+        last.next = tokenize(regex_pos, end);
         return t;
     }
 
@@ -247,7 +242,7 @@ class Tokenizer {
         int ifEndParen = findMatchingParen(regex_pos);
 
         // Support testing if capture group exists.
-        Token ifToken = tokenize(regex_pos, ifEndParen, true);
+        Token ifToken = tokenize(regex_pos, ifEndParen);
         Token thenToken;
         Token elseToken;
 
@@ -312,10 +307,10 @@ class Tokenizer {
         List<Integer> pipes = findPipes(regex_pos, endParen);
 
         for (int pipe : pipes) {
-            t.addAlt(tokenize(regex_pos, pipe, true));
+            t.addAlt(tokenize(regex_pos, pipe));
             regex_pos = pipe + 1;
         }
 
-        t.addAlt(tokenize(regex_pos, endParen, true));
+        t.addAlt(tokenize(regex_pos, endParen));
     }
 }

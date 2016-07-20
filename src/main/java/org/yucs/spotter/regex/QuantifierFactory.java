@@ -39,9 +39,17 @@ class QuantifierFactory {
         }
 
         if (q != null) {
-            if (regex_pos < regex.length() && regex.charAt(regex_pos) == '?') {
-                q.greedy = false;
-                regex_pos++;
+            if (regex_pos < regex.length()) {
+                switch (regex.charAt(regex_pos)) {
+                    case '?':
+                        q.matchType = Quantifier.type.NONGREEDY;
+                        regex_pos++;
+                        break;
+                    case '+':
+                        q.matchType = Quantifier.type.POSESSIVE;
+                        regex_pos++;
+                        break;
+                }
             }
             return new QuantifierFactory(q, regex_pos);
         }

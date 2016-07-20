@@ -136,6 +136,15 @@ public class RegexTests {
         r = new Regex("^\\$$");
         assertTrue(r.match("$"));
         assertFalse(r.match("+"));
+
+        r = new Regex("^\\.$");
+        assertTrue(r.match("."));
+        assertFalse(r.match("+"));
+
+        r = new Regex("^\\-$");
+        assertTrue(r.match("-"));
+        assertFalse(r.match("+"));
+
     }
 
     @Test

@@ -8,10 +8,6 @@ class AnchorToken extends Token {
         this.anchor = a;
     }
 
-    public String toString() {
-        return "Anchor: " + anchor;
-    }
-
     @Override
     boolean match(Matcher m) throws RegexException {
         String text = m.getText();
