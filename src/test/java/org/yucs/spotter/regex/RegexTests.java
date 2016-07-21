@@ -2,6 +2,8 @@ package org.yucs.spotter.regex;
 
 import org.junit.Test;
 
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 public class RegexTests {
@@ -227,6 +229,11 @@ public class RegexTests {
         assertEquals(m.getGroup(1), "regex");
         assertTrue(m.match("abc"));
         assertEquals(m.getGroup(2), "abc");
+
+        List<String> groups = m.getGroups();
+        assertEquals("abc", groups.get(0));
+        assertEquals(null, groups.get(1));
+        assertEquals("abc", groups.get(2));
     }
 
     @Test

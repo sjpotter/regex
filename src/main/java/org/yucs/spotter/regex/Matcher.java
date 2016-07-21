@@ -10,7 +10,7 @@ public class Matcher {
 
     final private int parenCount;
     final private Map<Integer, NormalExpressionToken> captureMap;
-    private int iterator = 1;
+    private int direction = 1;
 
     private final Token t;
 
@@ -135,8 +135,8 @@ public class Matcher {
         nextStack = m.nextStack;
     }
 
-    public int getIterator() { return iterator; }
-    public void setIterator(int i) { iterator = i; }
+    public int getDirection() { return direction; }
+    public void setDirection(int i) { direction = i; }
 
     Stack<Token> saveNextStack() {
         Stack<Token> savedState = nextStack;

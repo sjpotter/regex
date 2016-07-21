@@ -2,7 +2,9 @@ package org.yucs.spotter.regex;
 
 /*
  * BackReference gets the captured group state from a previous group and checks if the text matches that here
+ * ex: in capture group 1 we captured abc, the text we are at must also have the next three character be abc
  */
+
 class BackReferenceToken extends Token {
     private final int backreference;
 
@@ -13,7 +15,7 @@ class BackReferenceToken extends Token {
 
     @Override
     boolean match(Matcher m) throws RegexException {
-        if (m.getIterator() != -1) {
+        if (m.getDirection() != -1) {
             return forwardMatch(m);
         }
 

@@ -1,5 +1,8 @@
 package org.yucs.spotter.regex;
 
+// CharacterToken matches against a single character in the text based on the character class that it contains
+// It moves the text forwards or backwards depending on the direction we are currently moving in the match (ex: look behinds)
+
 class CharacterToken extends Token {
     private final CharacterClass c;
 
@@ -13,7 +16,7 @@ class CharacterToken extends Token {
         String text = m.getText();
         int text_pos = m.getTextPosition();
 
-        int iterator = m.getIterator();
+        int iterator = m.getDirection();
         if (iterator == -1) {
             if (text_pos == 0) {
                 return false;

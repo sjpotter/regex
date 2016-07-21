@@ -79,10 +79,7 @@ class CharacterClass {
     }
 
     private void parseSlash(boolean negate, String s, int pos) throws RegexException {
-        if (s.length() == pos + 1) {
-            throw new RegexException("string ended with a single unescaped \\");
-        }
-
+        // In tokenizer checked to make sure we aren't ending with a single slash
         switch (s.charAt(pos + 1)) {
             case '.':
                 characters.add('.');

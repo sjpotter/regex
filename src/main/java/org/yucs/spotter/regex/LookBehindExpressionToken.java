@@ -16,7 +16,7 @@ class LookBehindExpressionToken extends Token implements TestableToken {
     @Override
     boolean match(Matcher m) throws RegexException {
         int pos = m.getTextPosition();
-        m.setIterator(-1);
+        m.setDirection(-1);
 
         // Empty stack as only matters that its string of tokens match
         Stack<Token> savedState = m.saveAndResetNextStack();
@@ -25,7 +25,7 @@ class LookBehindExpressionToken extends Token implements TestableToken {
 
         m.restoreNextStack(savedState);
 
-        m.setIterator(1);
+        m.setDirection(1);
         m.setTextPosition(pos);
 
         if (positive) {

@@ -1,5 +1,10 @@
 package org.yucs.spotter.regex;
 
+// Anchor Tokens make sure the position we are in the text corresponds to some rule
+// ^ - we are at text_pos = 0,
+// $ - we have text_pos = text.length() (i.e. one beyond the last character, aka matched everything in text)
+// \b and \B at a word break or not at a word break (ex: between 2 alphabetic characters or not)
+
 class AnchorToken extends Token {
     private final char anchor;
 
@@ -14,14 +19,14 @@ class AnchorToken extends Token {
         int text_pos = m.getTextPosition();
 
         switch (anchor) {
-            case '$':
+            case '$': // end of text anchor, continues matching as can e a lookbehind at this point
                 return text_pos == text.length() && next.match(m);
 
-            case '^':
+            case '^': // start of text anchor
                 return 0 == text_pos && next.match(m);
 
-            case 'b':
-            case 'B': {
+            case 'b': // word break anchor
+            case 'B': { // negative word break anchors
                 boolean negative = false;
                 if (anchor == 'B')
                     negative = true;
