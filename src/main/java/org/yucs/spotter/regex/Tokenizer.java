@@ -117,9 +117,8 @@ class Tokenizer {
                     }
                 } else { // normal capture
                     int capture = captureCount++;
-                    t = new StartCaptureToken();
-                    t.next = createCapturedExpressionToken(capture, regex_pos + 1, endParen);
-                    t.next.next = new EndCaptureToken(t, capture);
+                    t = createCapturedExpressionToken(capture, regex_pos + 1, endParen);
+                    t = new StartCaptureToken(capture, t);
                 }
                 regex_pos = endParen + 1;
             }
@@ -133,20 +132,13 @@ class Tokenizer {
             regex_pos = ccf.regex_pos;
         }
 
-        Token last = t;
-
-        // handling the startcapturetoken / expression / endcapturetoken sequence
-        while (!(last.next instanceof NullToken))
-             last = last.next;
-
         QuantifierFactory qf = QuantifierFactory.parse(regex, regex_pos);
         if (qf != null) {
             t = new QuantifierToken(qf.q, t);
             regex_pos = qf.regex_pos;
-            last = t;
         }
 
-        last.next = tokenize(regex_pos, end);
+        t.next = tokenize(regex_pos, end);
         return t;
     }
 

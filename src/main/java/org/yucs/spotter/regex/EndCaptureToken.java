@@ -1,30 +1,29 @@
 package org.yucs.spotter.regex;
 
 /*
- * EndCapture saves the text between it and its matching StartCaptureToken.
- * It also saves the previous state so if the matching along this path fails later, the state can be restored
+ * Dynamically inserted into the nextStack when a start captureToken is executed
+ * If reached, captures the state between start_pos (where StartCaptureToken was) and current text position
+ * If we fail matching after it, revert the capture, by popping it off the capture stack.
  */
 
 class EndCaptureToken extends Token {
-    final private StartCaptureToken start;
-    final private int capture_pos;
+    final private int capture;
+    final private int start_pos;
 
-    int invalid_capture = 1;
-
-    EndCaptureToken(Token t, int pos) {
-        start = (StartCaptureToken) t;
-        capture_pos = pos;
+    EndCaptureToken(int capture, int start_pos) {
+        this.capture = capture;
+        this.start_pos = start_pos;
     }
 
     @Override
     boolean match(Matcher m) throws RegexException {
-        m.pushGroup(capture_pos, m.getText().substring(start.start_pos, m.getTextPosition()));
+        m.pushGroup(capture, m.getText().substring(start_pos, m.getTextPosition()));
 
         if (next.match(m))
             return true;
 
         // this isn't a valid path, so this isn't a valid capture.
-        m.popGroup(capture_pos);
+        m.popGroup(capture);
         return false;
     }
 }

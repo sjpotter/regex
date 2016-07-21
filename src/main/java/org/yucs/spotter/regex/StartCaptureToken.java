@@ -1,18 +1,22 @@
 package org.yucs.spotter.regex;
 
 class StartCaptureToken extends Token {
-    int start_pos;
+    final private Token t;
+    private final int capture;
+
+    StartCaptureToken(int capture, Token t) {
+        this.capture = capture;
+        this.t = t;
+    }
 
     @Override
     boolean match(Matcher m) throws RegexException {
-        int old_start_pos = start_pos;
+        int start_pos = m.getTextPosition();
 
-        start_pos = m.getTextPosition();
-        boolean ret = next.match(m);
+        Token end = new EndCaptureToken(capture, start_pos);
+        end.next = next;
+        m.pushNextStack(end);
 
-        if (!ret)
-            start_pos = old_start_pos;
-
-        return ret;
+        return t.match(m);
     }
 }
