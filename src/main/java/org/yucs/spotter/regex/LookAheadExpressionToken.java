@@ -3,6 +3,8 @@ package org.yucs.spotter.regex;
 import java.util.Stack;
 
 // Positive and Negative Lookahead matching
+// Determines if something is matchable (or not) in the forward direction from this location
+// state is reset after the attempted match
 
 class LookAheadExpressionToken extends Token implements TestableToken {
     final private NormalExpressionToken t;

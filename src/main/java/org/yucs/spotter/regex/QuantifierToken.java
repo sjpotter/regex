@@ -4,6 +4,14 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 
+/*
+ * Quantifiers determine how many times (iterations) the token they contain must be matched (min) or can be matched (max)
+ * There are multiple strategies for how quantifiers are matched once past the minimum.
+ * Greedy - match as many iterations as one can (max), but backtrack an iteration if can't match the rest of the regex
+ * NonGreedy - try to match rest of regex, and if can't, match a single iteration and then rinse and repeat till max iterations
+ * Possessive - like greedy, matcha as many iterations as one can, but don't backtrack and just quick fail if can't match rest of regex
+ */
+
 class QuantifierToken extends Token {
     // Defines the quantification to be used
     final private Quantifier q;

@@ -2,7 +2,7 @@ package org.yucs.spotter.regex;
 
 class StartCaptureToken extends Token {
     final private Token t;
-    private final int capture;
+    final private int capture;
 
     StartCaptureToken(int capture, Token t) {
         this.capture = capture;

@@ -4,6 +4,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+// Abstract base class for AtomicExpressionToken and NormalExpressionToken
+// provides the common "Alt" handling (adding, iterating, reversing)
+
 abstract class ExpressionToken extends Token {
     final private List<Token> alts = new LinkedList<>();
 
@@ -29,5 +32,4 @@ abstract class ExpressionToken extends Token {
 
         return super.reverse();
     }
-
 }

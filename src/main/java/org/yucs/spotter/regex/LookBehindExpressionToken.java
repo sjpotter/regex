@@ -1,6 +1,8 @@
 package org.yucs.spotter.regex;
 
 // Positive and Negative Look behind matching
+// Determines if something is matchable (or not) in the backwards direction from this location
+// state is reset after the attempted match
 
 import java.util.Stack;
 

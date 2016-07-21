@@ -2,6 +2,9 @@ package org.yucs.spotter.regex;
 
 import java.util.Stack;
 
+// Provides logic structure within a regex to determine which part of a regex will be martched against
+// If the ifToken is matchable from current text position, we try to match the thenToken, otherwise we match the elseToken
+
 class IfThenElseToken extends Token {
     final private Token ifToken;
     final private Token thenToken;
