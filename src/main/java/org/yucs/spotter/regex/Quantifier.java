@@ -1,7 +1,7 @@
 package org.yucs.spotter.regex;
 
 class Quantifier {
-    enum type { GREEDY, NONGREEDY, POSESSIVE }
+    enum type { GREEDY, NONGREEDY, POSSESSIVE}
 
     final int min;
     final int max;

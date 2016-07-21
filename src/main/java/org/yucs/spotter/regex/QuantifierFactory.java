@@ -46,7 +46,7 @@ class QuantifierFactory {
                         regex_pos++;
                         break;
                     case '+':
-                        q.matchType = Quantifier.type.POSESSIVE;
+                        q.matchType = Quantifier.type.POSSESSIVE;
                         regex_pos++;
                         break;
                 }

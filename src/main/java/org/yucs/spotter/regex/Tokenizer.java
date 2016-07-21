@@ -134,7 +134,17 @@ class Tokenizer {
 
         QuantifierFactory qf = QuantifierFactory.parse(regex, regex_pos);
         if (qf != null) {
-            t = new QuantifierToken(qf.q, t);
+            switch (qf.q.matchType) {
+                case GREEDY:
+                    t = new QuantifierGreedyToken(qf.q, t);
+                    break;
+                case NONGREEDY:
+                    t = new QuantifierNonGreedyToken(qf.q, t);
+                    break;
+                case POSSESSIVE:
+                    t = new QuantifierPossessiveToken(qf.q, t);
+                    break;
+            }
             regex_pos = qf.regex_pos;
         }
 
