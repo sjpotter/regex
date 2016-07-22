@@ -1,22 +1,16 @@
 package org.yucs.spotter.regex;
 
-import java.util.HashSet;
-import java.util.Set;
-
 abstract class QuantifierToken extends Token {
     private final int min;
     final int max;
     final protected Token t;
     final boolean clone;
 
-    Set<Integer> seen;
-
-    protected QuantifierToken(int min, int max, Token t, boolean clone, Set<Integer> seen) {
+    protected QuantifierToken(int min, int max, Token t, boolean clone) {
         this.min = min;
         this.max = max;
         this.t = t;
         this.clone = clone;
-        this.seen = seen;
     }
 
     abstract boolean maxQuantifierStrategy(Matcher m) throws RegexException;
@@ -25,9 +19,6 @@ abstract class QuantifierToken extends Token {
 
     @Override
     boolean match(Matcher m) throws RegexException {
-        if (!clone)
-            seen = new HashSet<>();
-
         // if haven't matched the minimum # of times yet, stick a decremented QuantifierToken on next stack and
         // try to match the token we are quantifying
         if (min != 0) {

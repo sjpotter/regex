@@ -1,15 +1,14 @@
 package org.yucs.spotter.regex;
 
-import java.util.Set;
 import java.util.Stack;
 
 class QuantifierPossessiveToken extends QuantifierToken {
     QuantifierPossessiveToken(Quantifier q, Token t) {
-        this(q.min, q.max, t, false, null);
+        this(q.min, q.max, t, false);
     }
 
-    private QuantifierPossessiveToken(int min, int max, Token t, boolean clone, Set<Integer> seen) {
-        super(min, max, t, clone, seen);
+    private QuantifierPossessiveToken(int min, int max, Token t, boolean clone) {
+        super(min, max, t, clone);
     }
 
     @Override
@@ -29,7 +28,7 @@ class QuantifierPossessiveToken extends QuantifierToken {
 
     @Override
     QuantifierToken cloneDecrement() {
-        QuantifierToken qt = new QuantifierPossessiveToken(decrementMin(), decrementMax(), t, true, seen);
+        QuantifierToken qt = new QuantifierPossessiveToken(decrementMin(), decrementMax(), t, true);
         qt.next = this.next;
 
         return qt;

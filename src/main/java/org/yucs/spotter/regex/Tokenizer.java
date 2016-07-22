@@ -132,19 +132,10 @@ class Tokenizer {
             regex_pos = ccf.regex_pos;
         }
 
+        // Determine if token is being quantified, and if so, wrap in the appropriate QuantifierToken
         QuantifierFactory qf = QuantifierFactory.parse(regex, regex_pos);
         if (qf != null) {
-            switch (qf.q.matchType) {
-                case GREEDY:
-                    t = new QuantifierGreedyToken(qf.q, t);
-                    break;
-                case NONGREEDY:
-                    t = new QuantifierNonGreedyToken(qf.q, t);
-                    break;
-                case POSSESSIVE:
-                    t = new QuantifierPossessiveToken(qf.q, t);
-                    break;
-            }
+            t = QuantifierFactory.genToken(qf, t);
             regex_pos = qf.regex_pos;
         }
 

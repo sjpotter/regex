@@ -1,7 +1,7 @@
 package org.yucs.spotter.regex;
 
 class QuantifierFactory {
-    final Quantifier q;
+    private final Quantifier q;
     final int regex_pos;
 
     private QuantifierFactory(Quantifier q, int regex_pos) {
@@ -97,5 +97,18 @@ class QuantifierFactory {
 
         //regex following { invalid as a quantifier
         return null;
+    }
+
+    static Token genToken(QuantifierFactory qf, Token t) throws RegexException {
+        switch (qf.q.matchType) {
+            case GREEDY:
+                return new QuantifierGreedyToken(qf.q, t);
+            case NONGREEDY:
+                return new QuantifierNonGreedyToken(qf.q, t);
+            case POSSESSIVE:
+                return new QuantifierPossessiveToken(qf.q, t);
+            default:
+                throw new RegexException("Unknown Quantifier Type: " + qf.q.matchType);
+        }
     }
 }

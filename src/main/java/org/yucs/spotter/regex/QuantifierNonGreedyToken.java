@@ -1,19 +1,26 @@
 package org.yucs.spotter.regex;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 
 class QuantifierNonGreedyToken extends QuantifierToken {
+    private Set<Integer> seen;
+
     QuantifierNonGreedyToken(Quantifier q, Token t) {
         this(q.min, q.max, t, false, null);
     }
 
     private QuantifierNonGreedyToken(int min, int max, Token t, boolean clone, Set<Integer> seen) {
-        super(min, max, t, clone, seen);
+        super(min, max, t, clone);
+        this.seen = seen;
     }
 
     @Override
     boolean maxQuantifierStrategy(Matcher m) throws RegexException {
+        if (!clone || seen == null)
+            seen = new HashSet<>();
+
         int startPos = m.getTextPosition();
 
         Stack<Token> savedState = m.saveNextStack();
@@ -32,6 +39,7 @@ class QuantifierNonGreedyToken extends QuantifierToken {
             m.restoreNextStack(savedState);
 
             m.pushNextStack(cloneDecrement());
+
             return t.match(m);
         }
 
