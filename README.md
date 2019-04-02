@@ -7,7 +7,7 @@ to save my ideas that aren't working yet while I look at another approach.
 
 ### Problem as presented
 
-Write a simple regex matcher that can match characters, along with the regex symbols '.' and '*' for any character and 0
+Write a simple regex matcher that can match characters, along with the regex symbols `.` and `*` for any character and 0
 to infinity quantification.  This is simple, and in fact Rob Pike wrote a simple 30 line C program to do the same thing.
 <sup>[1](#myfootnote1)</sup><sup>,</sup><sup>[2](#myfootnote2)</sup>
 
@@ -22,7 +22,7 @@ illustration of this.
 
 the base case is
 
- - if we haven't reached the end of the text, check that the character we are up to in the regex is either a '.' or the
+ - if we haven't reached the end of the text, check that the character we are up to in the regex is either a `.` or the
  same character we are up to in the text and then continue
 
 ```c
@@ -38,10 +38,10 @@ int matchhere(char *regexp, char *text)
 }
 ```
 
-to add the '*' quantifier we can simply check for the '*' quantifier on the next regex character
+to add the `*` quantifier we can simply check for the the next regex character for a `*`
 
- - if the next regex character is a * on the current regex character while passing in the rest of the regex string and
- the text that w are matching again
+ - if the next regex character is a `*` on the current regex character while passing in the rest of the regex string and
+ the text that we are matching again
 
 ```c
 if (regexp[1] == '*')
